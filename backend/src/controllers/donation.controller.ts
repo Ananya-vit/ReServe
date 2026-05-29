@@ -9,7 +9,6 @@ type CreateDonationBody = {
   description?: string;
   specialInstructions?: string;
   pickupDeadline: string | Date;
-  expiresAt: string | Date;
   pickupLocationId: number;
 };
 
@@ -22,7 +21,6 @@ const createDonation = async (req: express.Request, res: express.Response) => {
       description,
       specialInstructions,
       pickupDeadline,
-      expiresAt,
       pickupLocationId,
     } = req.body as CreateDonationBody;
     const donorId = req.user?.userId;
@@ -33,7 +31,6 @@ const createDonation = async (req: express.Request, res: express.Response) => {
       !foodType ||
       !quantity ||
       !pickupDeadline ||
-      !expiresAt ||
       !pickupLocationId
     ) {
       return res.status(400).json({ message: "Missing required fields!" });
@@ -41,7 +38,7 @@ const createDonation = async (req: express.Request, res: express.Response) => {
 
     const donation = await prisma.donation.create({
       data: {
-        donorId: req.user!.userId,
+        donorId,
         pickupLocationId,
         foodName,
         foodType,
@@ -49,7 +46,6 @@ const createDonation = async (req: express.Request, res: express.Response) => {
         description,
         specialInstructions,
         pickupDeadline: new Date(pickupDeadline),
-        expiresAt: new Date(expiresAt),
       },
     });
     res.status(201).json({ message: "Donation created successfully!", donation });

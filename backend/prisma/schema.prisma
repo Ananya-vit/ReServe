@@ -158,8 +158,6 @@ model Donation {
 
   specialInstructions String?
 
-  expiresAt DateTime
-
   pickupDeadline DateTime
 
 
