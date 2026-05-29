@@ -12,9 +12,281 @@ datasource db {
   provider = "postgresql"
 }
 
+enum RoleEnum {
+  DONOR
+  NGO
+  USER
+  ADMIN
+}
 
-model User { 
-  id    Int     @id @default(autoincrement()) 
-  email String  @unique
-  name  String?
-} 
+enum FoodTypeEnum {
+  VEG
+  NON_VEG
+}
+
+enum DonationStatusEnum {
+  AVAILABLE
+  RESERVED
+  PICKED_UP
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum ClaimStatusEnum {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  PICKED_UP
+  COMPLETED
+}
+
+enum NotificationTypeEnum {
+  FOOD_POSTED
+  CLAIM_REQUEST
+  CLAIM_ACCEPTED
+  CLAIM_REJECTED
+  PICKUP_REMINDER
+  EXPIRY_WARNING
+}
+
+enum SnapshotPeriodEnum {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  name         String?
+  email        String  @unique
+  passwordHash String
+
+  role RoleEnum @default(DONOR)
+
+  phone String?
+
+  isVerified Boolean @default(false)
+  trustScore Float   @default(0)
+
+  mealsDonated      Int @default(0)
+  mealsReceived     Int @default(0)
+  successfulPickups Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  locations       UserLocation[]
+  pickupLocations PickupLocation[]
+
+  donations Donation[]
+
+  claims Claim[]
+
+  notifications Notification[]
+
+  ratingsGiven    Rating[] @relation("RatingGiven")
+  ratingsReceived Rating[] @relation("RatingReceived")
+
+  verificationDocs VerificationDocument[]
+}
+
+model UserLocation {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  latitude  Float?
+  longitude Float?
+
+  address String
+  city    String
+  state   String
+  pincode String
+
+  isPrimary Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([latitude, longitude])
+}
+
+model PickupLocation {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  latitude  Float?
+  longitude Float?
+
+  address String
+  city    String
+  state   String
+  pincode String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  donations Donation[]
+
+  @@index([latitude, longitude])
+}
+
+model Donation {
+  id Int @id @default(autoincrement())
+
+  donor   User @relation(fields: [donorId], references: [id])
+  donorId Int
+
+  pickupLocation PickupLocation @relation(fields: [pickupLocationId], references: [id])
+
+  pickupLocationId Int
+
+  foodName String
+
+  foodType FoodTypeEnum
+
+  quantity Int
+
+  status DonationStatusEnum @default(AVAILABLE)
+
+  description String?
+
+  specialInstructions String?
+
+  expiresAt DateTime
+
+  pickupDeadline DateTime
+
+  availablePickupTimes DateTime[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images DonationImage[]
+
+  claims Claim[]
+
+  notifications Notification[]
+
+  ratings Rating[]
+}
+
+model DonationImage {
+  id Int @id @default(autoincrement())
+
+  donation   Donation @relation(fields: [donationId], references: [id], onDelete: Cascade)
+  donationId Int
+
+  imageUrl String
+
+  createdAt DateTime @default(now())
+}
+
+model Claim {
+  id Int @id @default(autoincrement())
+
+  donation   Donation @relation(fields: [donationId], references: [id])
+  donationId Int
+
+  claimer   User @relation(fields: [claimerId], references: [id])
+  claimerId Int
+
+  status ClaimStatusEnum @default(PENDING)
+
+  scheduledPickup DateTime?
+
+  actualPickup DateTime?
+
+  cancellationReason String?
+
+  confirmationPhotoUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notifications Notification[]
+}
+
+model Notification {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  donation   Donation? @relation(fields: [donationId], references: [id])
+  donationId Int?
+
+  claim   Claim? @relation(fields: [claimId], references: [id])
+  claimId Int?
+
+  type NotificationTypeEnum
+
+  title String
+
+  body String
+
+  isRead Boolean @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model Rating {
+  id Int @id @default(autoincrement())
+
+  rating Int
+  review String?
+
+  fromUser   User @relation("RatingGiven", fields: [fromUserId], references: [id])
+  fromUserId Int
+
+  toUser   User @relation("RatingReceived", fields: [toUserId], references: [id])
+  toUserId Int
+
+  donation   Donation @relation(fields: [donationId], references: [id])
+  donationId Int
+
+  createdAt DateTime @default(now())
+}
+
+model VerificationDocument {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  documentUrl String
+
+  approved Boolean @default(false)
+
+  uploadedAt DateTime @default(now())
+}
+
+model AnalyticsSnapshot {
+  id Int @id @default(autoincrement())
+
+  snapshotDate DateTime @default(now())
+
+  period SnapshotPeriodEnum
+
+  totalDonations Int
+
+  mealsSaved Int
+
+  activeDonors Int
+
+  successfulPickups Int
+
+  expiredDonations Int
+
+  cancellations Int
+
+  pickupSuccessRate Float
+
+  createdAt DateTime @default(now())
+}
