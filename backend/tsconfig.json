@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
 
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
 
     "strict": true,
 
@@ -25,9 +25,11 @@
 
     "resolveJsonModule": true,
 
-    "isolatedModules": true
+    "isolatedModules": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
   },
 
-  "include": ["src"],
+  "include": ["src", "generated"],
   "exclude": ["node_modules", "dist"]
 }

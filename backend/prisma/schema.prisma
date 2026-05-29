@@ -144,7 +144,6 @@ model Donation {
   donorId Int
 
   pickupLocation PickupLocation @relation(fields: [pickupLocationId], references: [id])
-
   pickupLocationId Int
 
   foodName String
