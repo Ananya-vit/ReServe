@@ -46,7 +46,7 @@ const loginController = async (req: express.Request, res: express.Response) => {
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid credentials!" });
     }
-    const payload = { userId: user.id, email: user.email };
+    const payload = { userId: user.id, email: user.email, role: user.role };
     const accessToken = generateAccessToken({ ...payload, type: "access" });
     const refreshToken = generateRefreshToken({ ...payload, type: "refresh" });
     res
@@ -70,11 +70,7 @@ const refreshTokenController = async (
     if (!refreshToken) {
       return res.status(400).json({ message: "Refresh token is required!" });
     }
-    const payload = verifyToken(refreshToken) as {
-      userId: number;
-      email: string;
-      type: string;
-    };
+    const payload = verifyToken(refreshToken) as Express.UserPayload;
     if (payload.type !== "refresh") {
       return res.status(400).json({ message: "Invalid token type!" });
     }

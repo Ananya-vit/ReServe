@@ -1,4 +1,17 @@
 import express from "express";
+import { prisma } from "../lib/prisma.ts";
+import { FoodTypeEnum } from "../../generated/prisma/enums.ts";
+
+type CreateDonationBody = {
+  foodName: string;
+  foodType: FoodTypeEnum;
+  quantity: number;
+  description?: string;
+  specialInstructions?: string;
+  pickupDeadline: string | Date;
+  expiresAt: string | Date;
+  pickupLocationId: number;
+};
 
 const createDonation = async (req: express.Request, res: express.Response) => {
   try {
@@ -9,14 +22,37 @@ const createDonation = async (req: express.Request, res: express.Response) => {
       description,
       specialInstructions,
       pickupDeadline,
-    } = req.body;
+      expiresAt,
+      pickupLocationId,
+    } = req.body as CreateDonationBody;
+    const donorId = req.user?.userId;
     // Validate required fields
-    if (!foodName || !foodType || !quantity || !pickupDeadline) {
+    if (
+      !donorId ||
+      !foodName ||
+      !foodType ||
+      !quantity ||
+      !pickupDeadline ||
+      !expiresAt ||
+      !pickupLocationId
+    ) {
       return res.status(400).json({ message: "Missing required fields!" });
     }
-    // Logic to create a donation in the database
-    
-    res.status(201).json({ message: "Donation created successfully!" });
+
+    const donation = await prisma.donation.create({
+      data: {
+        donorId: req.user!.userId,
+        pickupLocationId,
+        foodName,
+        foodType,
+        quantity,
+        description,
+        specialInstructions,
+        pickupDeadline: new Date(pickupDeadline),
+        expiresAt: new Date(expiresAt),
+      },
+    });
+    res.status(201).json({ message: "Donation created successfully!", donation });
   } catch (error) {
     res.status(400).json({ error: "Invalid request body" });
   }

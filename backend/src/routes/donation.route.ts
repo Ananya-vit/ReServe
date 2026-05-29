@@ -6,13 +6,14 @@ import {
   getDonationById,
   updateDonation,
 } from "../controllers/donation.controller.ts";
+import { authMiddleware } from "../middlewares/auth.middleware.ts";
 
 const donationRouter = express.Router();
 
-donationRouter.post("/", createDonation);
+donationRouter.post("/",authMiddleware, createDonation);
 donationRouter.get("/", getAllDonations);
 donationRouter.get("/:id", getDonationById);
-donationRouter.put("/:id", updateDonation);
-donationRouter.delete("/:id", deleteDonation);
+donationRouter.put("/:id", authMiddleware, updateDonation);
+donationRouter.delete("/:id", authMiddleware, deleteDonation);
 
 export default donationRouter;
