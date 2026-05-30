@@ -30,7 +30,7 @@ const OtpVerification = () => {
         />
 
         <nav className="relative z-10 flex items-center justify-between px-6 py-6 md:px-10">
-          <div className="flex items-center gap-2">
+          <Link className="flex items-center gap-2" to="/">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M16 3C9 3 4 9 4 16C4 23 9 29 16 29C23 29 28 23 28 16C28 9 23 3 16 3Z"
@@ -41,7 +41,7 @@ const OtpVerification = () => {
               <path d="M16 8L15 12L12 13L14 16L13 20L16 19L20 21L20 17L23 14L20 12Z" fill="#F4A01C" />
             </svg>
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
-          </div>
+          </Link>
           <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
             <Link className="hover:opacity-70" to="/">
               Home

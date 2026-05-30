@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const ForDonorBlog = () => {
   return (
     <div className="bg-white text-[#1A1A1A]">
-      <section className="relative overflow-hidden bg-white py-16">
+      <section className="relative overflow-hidden bg-white">
         <div
           className="absolute -top-[80px] -right-[120px] h-[240px] w-[320px] bg-[#F4A01C] opacity-80"
           style={{ borderRadius: '60% 40% 70% 30% / 50% 60% 40% 50%' }}
@@ -14,8 +14,37 @@ const ForDonorBlog = () => {
           style={{ borderRadius: '40% 60% 30% 70% / 60% 40% 60% 40%' }}
         />
 
+        <nav className="relative z-10 flex items-center justify-between px-6 py-6 md:px-10">
+          <Link className="flex items-center gap-2" to="/">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M16 3C9 3 4 9 4 16C4 23 9 29 16 29C23 29 28 23 28 16C28 9 23 3 16 3Z"
+                fill="#F4A01C"
+                opacity=".3"
+              />
+              <path d="M14 6L12 10L8 11L10 15L9 20L14 18L18 21L19 16L23 13L19 11Z" fill="#4CAF50" />
+              <path d="M16 8L15 12L12 13L14 16L13 20L16 19L20 21L20 17L23 14L20 12Z" fill="#F4A01C" />
+            </svg>
+            <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              className="rounded border border-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.06em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
+              to="/donations"
+            >
+              List surplus
+            </Link>
+            <Link
+              className="rounded bg-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
+              to="/claims"
+            >
+              Claim surplus
+            </Link>
+          </div>
+        </nav>
+
         <div className="mx-auto max-w-6xl px-6 md:px-10">
-          <Link className="text-xs font-semibold uppercase tracking-[0.3em] text-[#F4A01C]" to="/">
+          <Link className="text-xs font-semibold uppercase tracking-[0.3em] text-[#F4A01C] hover:text-[#1A1A1A]" to="/">
             Back to home
           </Link>
           <h1
