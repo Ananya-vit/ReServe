@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const claimDonationsSeed = [
   {
@@ -304,6 +305,16 @@ const Claim = () => {
   const [page, setPage] = useState(1)
   const [isClaimsOpen, setIsClaimsOpen] = useState(false)
   const [claimsPage, setClaimsPage] = useState(1)
+  const [isClaimFormOpen, setIsClaimFormOpen] = useState(false)
+  const [selectedDonation, setSelectedDonation] = useState(null)
+  const [claimSent, setClaimSent] = useState(false)
+  const [claimForm, setClaimForm] = useState({
+    ngoName: '',
+    contactPhone: '',
+    pickupDate: '',
+    quantity: '',
+    message: ''
+  })
   const pageSize = 6
   const claimsPageSize = 5
 
@@ -319,6 +330,35 @@ const Claim = () => {
     const start = (claimsPage - 1) * claimsPageSize
     return myClaimsSeed.slice(start, start + claimsPageSize)
   }, [claimsPage])
+
+  const handleOpenClaimForm = (donation) => {
+    setSelectedDonation(donation)
+    setClaimForm({
+      ngoName: '',
+      contactPhone: '',
+      pickupDate: '',
+      quantity: donation.quantity,
+      message: ''
+    })
+    setClaimSent(false)
+    setIsClaimFormOpen(true)
+  }
+
+  const handleCloseClaimForm = () => {
+    setIsClaimFormOpen(false)
+    setSelectedDonation(null)
+    setClaimSent(false)
+  }
+
+  const handleClaimChange = (event) => {
+    const { name, value } = event.target
+    setClaimForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleClaimSubmit = (event) => {
+    event.preventDefault()
+    setClaimSent(true)
+  }
 
   return (
     <div className="bg-white text-[#1A1A1A]">
@@ -346,25 +386,28 @@ const Claim = () => {
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
           </div>
           <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
-            <a className="hover:opacity-70" href="#">
-              About us
-            </a>
-            <a className="hover:opacity-70" href="#">
-              Discover
-            </a>
-            <a className="hover:opacity-70" href="#">
-              Whom we help
-            </a>
-            <a className="hover:opacity-70" href="#">
+            <Link className="hover:opacity-70" to="/about">
+              About
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/how-it-works">
+              How it works
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-donor">
+              For donors
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-ngo">
+              For NGOs
+            </Link>
+            <Link className="hover:opacity-70" to="/contact">
               Contact
-            </a>
+            </Link>
           </div>
-          <a
+          <Link
             className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            href="#"
+            to="/onboarding"
           >
             User Name
-          </a>
+          </Link>
         </nav>
       </section>
 
@@ -430,6 +473,13 @@ const Claim = () => {
                     <span>Posted</span>
                     <span>{item.postedAt}</span>
                   </div>
+                  <button
+                    className="w-full rounded border border-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
+                    onClick={() => handleOpenClaimForm(item)}
+                    type="button"
+                  >
+                    Claim food
+                  </button>
                 </div>
               </article>
             ))}
@@ -571,6 +621,111 @@ const Claim = () => {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isClaimFormOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
+          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2
+                  className="text-2xl font-black text-gray-900"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Claim request
+                </h2>
+                <p className="mt-1 text-xs text-gray-500">
+                  {selectedDonation ? `${selectedDonation.item} from ${selectedDonation.donor}` : 'Requesting a claim'}
+                </p>
+              </div>
+              <button className="text-sm text-gray-400 hover:text-gray-700" onClick={handleCloseClaimForm}>
+                Close
+              </button>
+            </div>
+
+            <form className="mt-6 space-y-4" onSubmit={handleClaimSubmit}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">NGO name</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    name="ngoName"
+                    onChange={handleClaimChange}
+                    placeholder="Your organization"
+                    type="text"
+                    value={claimForm.ngoName}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Contact phone</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    name="contactPhone"
+                    onChange={handleClaimChange}
+                    placeholder="+234 801 000 0000"
+                    type="tel"
+                    value={claimForm.contactPhone}
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Preferred pickup date</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    name="pickupDate"
+                    onChange={handleClaimChange}
+                    type="date"
+                    value={claimForm.pickupDate}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Quantity requested</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    name="quantity"
+                    onChange={handleClaimChange}
+                    placeholder="e.g. 12 trays"
+                    type="text"
+                    value={claimForm.quantity}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600">Message to donor</label>
+                <textarea
+                  className="mt-2 min-h-[120px] w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  name="message"
+                  onChange={handleClaimChange}
+                  placeholder="Share pickup details, team size, or storage needs."
+                  value={claimForm.message}
+                />
+              </div>
+
+              {claimSent ? (
+                <div className="rounded-xl bg-[#4CAF50]/10 px-4 py-3 text-xs text-[#2f7a33]">
+                  Claim request sent to the donor. We will notify you when they respond.
+                </div>
+              ) : null}
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  className="rounded bg-[#1A1A1A] px-5 py-3 text-xs uppercase tracking-[0.2em] text-white"
+                  type="submit"
+                >
+                  Send claim
+                </button>
+                <button
+                  className="text-xs font-semibold text-[#F4A01C]"
+                  onClick={handleCloseClaimForm}
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       ) : null}

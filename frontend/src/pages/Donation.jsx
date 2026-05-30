@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const donationsSeed = [
   {
@@ -274,25 +275,28 @@ const Donation = () => {
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
           </div>
           <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
-            <a className="hover:opacity-70" href="#">
-              About us
-            </a>
-            <a className="hover:opacity-70" href="#">
-              Discover
-            </a>
-            <a className="hover:opacity-70" href="#">
-              Whom we help
-            </a>
-            <a className="hover:opacity-70" href="#">
+            <Link className="hover:opacity-70" to="/about">
+              About
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/how-it-works">
+              How it works
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-donor">
+              For donors
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-ngo">
+              For NGOs
+            </Link>
+            <Link className="hover:opacity-70" to="/contact">
               Contact
-            </a>
+            </Link>
           </div>
-          <a
+          <Link
             className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            href="#"
+            to="/onboarding"
           >
             User Name
-          </a>
+          </Link>
         </nav>
       </section>
 

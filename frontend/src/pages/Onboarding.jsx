@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const steps = [
   {
@@ -54,22 +55,22 @@ const Onboarding = () => {
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
           </div>
           <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
-            <a className="hover:opacity-70" href="/">
+            <Link className="hover:opacity-70" to="/">
               Home
-            </a>
-            <a className="hover:opacity-70" href="/donations">
+            </Link>
+            <Link className="hover:opacity-70" to="/donations">
               Donations
-            </a>
-            <a className="hover:opacity-70" href="/claims">
+            </Link>
+            <Link className="hover:opacity-70" to="/claims">
               Claims
-            </a>
+            </Link>
           </div>
-          <a
+          <Link
             className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            href="/donations"
+            to="/donations"
           >
             List surplus
-          </a>
+          </Link>
         </nav>
       </section>
 
@@ -243,12 +244,12 @@ const Onboarding = () => {
                     Next step
                   </button>
                 ) : (
-                  <a
+                  <Link
                     className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.12em] text-white"
-                    href="/donations"
+                    to="/donations"
                   >
                     Go to dashboard
-                  </a>
+                  </Link>
                 )}
               </div>
             </div>

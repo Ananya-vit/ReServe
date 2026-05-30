@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const HomePage = () => {
   const isLoggedIn = false
@@ -24,7 +25,7 @@ const HomePage = () => {
         />
 
         <nav className="relative z-50 flex items-center justify-between px-6 py-6 md:px-10">
-          <div className="flex items-center gap-2">
+          <Link className="flex items-center gap-2" to="/">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M16 3C9 3 4 9 4 16C4 23 9 29 16 29C23 29 28 23 28 16C28 9 23 3 16 3Z"
@@ -35,23 +36,23 @@ const HomePage = () => {
               <path d="M16 8L15 12L12 13L14 16L13 20L16 19L20 21L20 17L23 14L20 12Z" fill="#F4A01C" />
             </svg>
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
-          </div>
+          </Link>
           <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
-            <a className="hover:opacity-70" href="#">
+            <Link className="hover:opacity-70" to="/about">
               About
-            </a>
-            <a className="hover:opacity-70" href="#">
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/how-it-works">
               How it works
-            </a>
-            <a className="hover:opacity-70" href="#">
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-donor">
               For donors
-            </a>
-            <a className="hover:opacity-70" href="#">
+            </Link>
+            <Link className="hover:opacity-70" to="/blog/for-ngo">
               For NGOs
-            </a>
-            <a className="hover:opacity-70" href="#">
+            </Link>
+            <Link className="hover:opacity-70" to="/contact">
               Contact
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-3">
             {isLoggedIn ? (
@@ -63,30 +64,30 @@ const HomePage = () => {
                   <span className="text-xs font-semibold text-gray-600">RS</span>
                 </button>
                 <div className="invisible absolute right-0 mt-2 w-36 rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg opacity-0 transition group-hover:visible group-hover:opacity-100">
-                  <a className="block rounded-lg px-3 py-2 hover:bg-gray-50" href="#">
+                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to="/onboarding">
                     Profile
-                  </a>
-                  <a className="block rounded-lg px-3 py-2 hover:bg-gray-50" href="#">
+                  </Link>
+                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to="/auth">
                     Logout
-                  </a>
+                  </Link>
                 </div>
               </div>
             ) : (
               <>
-                <a
+                <Link
                   className="rounded border border-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.06em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
-                  href="#"
+                  to="/donations"
                 >
                   <span className="md:hidden">List</span>
                   <span className="hidden md:inline">List surplus</span>
-                </a>
-                <a
+                </Link>
+                <Link
                   className="rounded bg-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-                  href="#"
+                  to="/claims"
                 >
                   <span className="md:hidden">Claim</span>
                   <span className="hidden md:inline">Claim surplus</span>
-                </a>
+                </Link>
               </>
             )}
           </div>
@@ -113,18 +114,18 @@ const HomePage = () => {
               ReServe connects restaurants, wedding venues, and event caterers with verified NGOs for fast, safe pickup.
             </p>
             <div className="flex items-center gap-4">
-              <a
+              <Link
                 className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-                href="#"
+                to="/donations"
               >
                 List surplus
-              </a>
-              <a className="flex items-center gap-1 text-sm text-gray-600 hover:opacity-70" href="#">
+              </Link>
+              <Link className="flex items-center gap-1 text-sm text-gray-600 hover:opacity-70" to="/donations">
                 Browse donations
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -295,18 +296,18 @@ const HomePage = () => {
                 Every pickup generates an impact report, so you can track meals saved and sustainability goals.
               </p>
               <div className="flex gap-4">
-                <a className="flex items-center gap-1 text-sm text-gray-700 hover:opacity-70" href="#">
+                <Link className="flex items-center gap-1 text-sm text-gray-700 hover:opacity-70" to="/blog/how-it-works">
                   Learn how it works
                   <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                   </svg>
-                </a>
-                <a
+                </Link>
+                <Link
                   className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-                  href="#"
+                  to="/donations"
                 >
                   List surplus
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -358,12 +359,12 @@ const HomePage = () => {
               <p className="mb-3 text-xs leading-relaxed text-gray-500">
                 End-of-day meals claimed by a local shelter within 30 minutes of posting.
               </p>
-              <a className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" href="#">
+              <Link className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" to="/donations">
                 View listing
                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </Link>
             </div>
 
             <div className="mt-8 transition-transform duration-200 hover:-translate-y-1">
@@ -380,12 +381,12 @@ const HomePage = () => {
               <p className="mb-3 text-xs leading-relaxed text-gray-500">
                 Buffet surplus redirected to three community kitchens the same night.
               </p>
-              <a className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" href="#">
+              <Link className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" to="/donations">
                 View listing
                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </Link>
             </div>
 
             <div className="transition-transform duration-200 hover:-translate-y-1">
@@ -402,12 +403,12 @@ const HomePage = () => {
               <p className="mb-3 text-xs leading-relaxed text-gray-500">
                 Event leftovers distributed to nearby NGO partners before closing.
               </p>
-              <a className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" href="#">
+              <Link className="flex items-center gap-1 text-xs text-orange-400 hover:opacity-70" to="/donations">
                 View listing
                 <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -540,18 +541,18 @@ const HomePage = () => {
               </h2>
               <p className="mb-8 text-xl font-light">Restaurants, caterers, and NGOs are welcome.</p>
               <div className="flex gap-4">
-                <a
+                <Link
                   className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#d4880f]"
-                  href="#"
+                  to="/donations"
                 >
                   Create listing
-                </a>
-                <a
+                </Link>
+                <Link
                   className="rounded border-2 border-white px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-white hover:text-[#1A1A1A]"
-                  href="#"
+                  to="/claims"
                 >
                   Partner as NGO
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -583,7 +584,7 @@ const HomePage = () => {
                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
                   />
                 </svg>
-                <span>help@ReServe.com</span>
+                <span>reserve@xsam.in</span>
               </div>
             </div>
 
@@ -616,40 +617,40 @@ const HomePage = () => {
             </div>
 
             <nav className="flex gap-6 text-xs text-gray-500 md:gap-8">
-              <a className="hover:underline" href="#">
+              <Link className="hover:underline" to="/about">
                 About
-              </a>
-              <a className="hover:underline" href="#">
+              </Link>
+              <Link className="hover:underline" to="/blog/how-it-works">
                 How it works
-              </a>
-              <a className="hover:underline" href="#">
+              </Link>
+              <Link className="hover:underline" to="/blog/for-donor">
                 For donors
-              </a>
-              <a className="hover:underline" href="#">
+              </Link>
+              <Link className="hover:underline" to="/blog/for-ngo">
                 For NGOs
-              </a>
-              <a className="hover:underline" href="#">
+              </Link>
+              <Link className="hover:underline" to="/contact">
                 Contact
-              </a>
+              </Link>
             </nav>
 
-            <a
+            <Link
               className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-              href="#"
+              to="/donations"
             >
               List surplus
-            </a>
+            </Link>
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-gray-100 pt-6 text-xs text-gray-400 md:flex-row">
             <p>ReServe keeps event and restaurant food out of landfills by matching it with community partners.</p>
             <div className="flex gap-4">
-              <a className="hover:underline" href="#">
+              <Link className="hover:underline" to="/about">
                 Privacy Policy
-              </a>
-              <a className="hover:underline" href="#">
+              </Link>
+              <Link className="hover:underline" to="/blog/how-it-works">
                 Discover
-              </a>
+              </Link>
             </div>
             <p>© 2024 ReServe. All Rights Reserved.</p>
           </div>

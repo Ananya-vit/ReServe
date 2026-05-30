@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const Auth = () => {
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState('signup')
   const [forgotSent, setForgotSent] = useState(false)
   const navigate = useNavigate()
 
@@ -67,7 +67,7 @@ const Auth = () => {
               </p>
             </div>
 
-            <div className="grid gap-4 rounded-2xl bg-[#F5F0E8]/50 p-6 sm:grid-cols-2">
+            <div className="hidden gap-4 rounded-2xl bg-[#F5F0E8]/50 p-6 md:grid md:grid-cols-2">
               <div className="rounded-xl bg-white p-4 shadow-sm">
                 <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Donors</p>
                 <p className="mt-2 text-sm font-semibold text-gray-900">Restaurants and venues post surplus food.</p>
@@ -295,6 +295,25 @@ const Auth = () => {
                 </button>
               </form>
             ) : null}
+          </div>
+
+          <div className="grid gap-4 rounded-2xl bg-[#F5F0E8]/50 p-6 md:hidden">
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Donors</p>
+              <p className="mt-2 text-sm font-semibold text-gray-900">Restaurants and venues post surplus food.</p>
+            </div>
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Claimers</p>
+              <p className="mt-2 text-sm font-semibold text-gray-900">NGOs claim food and schedule pickups.</p>
+            </div>
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Verification</p>
+              <p className="mt-2 text-sm font-semibold text-gray-900">Secure signup with OTP confirmation.</p>
+            </div>
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.18em] text-gray-400">Onboarding</p>
+              <p className="mt-2 text-sm font-semibold text-gray-900">Add pickup details and safety notes.</p>
+            </div>
           </div>
         </div>
       </section>
