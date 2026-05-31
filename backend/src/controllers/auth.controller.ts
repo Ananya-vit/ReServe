@@ -49,9 +49,11 @@ const loginController = async (req: express.Request, res: express.Response) => {
     const payload = { userId: user.id, email: user.email, role: user.role };
     const accessToken = generateAccessToken({ ...payload, type: "access" });
     const refreshToken = generateRefreshToken({ ...payload, type: "refresh" });
+    res.cookie("accessToken", accessToken)
+    res.cookie("refreshToken", refreshToken)
     res
-      .status(200)
-      .json({ message: "Login successful!", accessToken, refreshToken });
+    .status(200)
+    .json({ message: "Login successful!", accessToken, refreshToken });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in!" });
@@ -64,9 +66,9 @@ const refreshTokenController = async (
 ) => {
   try {
     const refreshToken =
-      req.body?.refreshToken ||
-      req.cookies?.refreshToken ||
-      req.headers["x-refresh-token"];
+    req.body?.refreshToken ||
+    req.cookies?.refreshToken ||
+    req.headers["x-refresh-token"];
     if (!refreshToken) {
       return res.status(400).json({ message: "Refresh token is required!" });
     }
@@ -78,6 +80,7 @@ const refreshTokenController = async (
       userId: payload.userId,
       email: payload.email,
     });
+    res.cookie("accessToken", newAccessToken)
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
     console.error("Error refreshing token:", error);

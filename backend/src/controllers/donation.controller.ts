@@ -57,12 +57,47 @@ const createDonation = async (req: express.Request, res: express.Response) => {
 const getAllDonations = async (
   req: express.Request,
   res: express.Response,
-) => {};
+) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 2;
+    const offset = (page - 1) * limit;
+
+    const donations = await prisma.donation.findMany({
+      skip: offset,
+      take: limit,
+      include: {
+        donor: true,
+        pickupLocation: true,
+      },
+    });
+    res.status(200).json({ donations });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch donations" });
+  }
+};
 
 const getDonationById = async (
   req: express.Request,
   res: express.Response,
-) => {};
+) => {
+  try {
+    const { id } = req.params as { id: string };
+    const donation = await prisma.donation.findUnique({
+      where: { id: parseInt(id) },
+      include: {
+        donor: true,
+        pickupLocation: true,
+      },
+    });
+    if (!donation) {
+      return res.status(404).json({ error: "Donation not found" });
+    }
+    res.status(200).json({ donation });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch donation" });
+  }
+};
 
 const updateDonation = async (
   req: express.Request,
