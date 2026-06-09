@@ -6,14 +6,15 @@ import {
   generateRefreshToken,
   verifyToken,
 } from "../utils/jwt.ts";
+import { sendOtpEmail, sendWelcomeEmail } from "../utils/email.ts";
+import { generateOtp, storeOtp, verifyOtp } from "../utils/otp.ts";
 
 const signupController = async (
   req: express.Request,
   res: express.Response,
 ) => {
-  let user;
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     const passwordHash = bcrypt.hashSync(password, 10);
     const existingUser = await prisma.user.findUnique({
       where: { email: email },
@@ -21,17 +22,88 @@ const signupController = async (
     if (existingUser) {
       return res.status(400).json({ message: "Email already in use!" });
     }
-    user = await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         name: name,
         email: email,
         passwordHash: passwordHash,
+        ...(role && { role }),
       },
     });
-    res.status(200).json({ message: "Signup successful!" });
+    const payload = { userId: user.id, email: user.email, role: user.role };
+    const accessToken = generateAccessToken({ ...payload, type: "access" });
+    const refreshToken = generateRefreshToken({ ...payload, type: "refresh" });
+    res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "strict" });
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
+
+    // Generate and send OTP email
+    const otp = generateOtp();
+    storeOtp(email, otp);
+    sendOtpEmail(email, name || "there", otp); // fire-and-forget
+
+    res.status(200).json({ message: "Signup successful!", accessToken, refreshToken });
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ message: "Error creating user!" });
+  }
+};
+
+const verifyOtpController = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: "Email and OTP are required." });
+    }
+
+    const isValid = verifyOtp(email, otp);
+    if (!isValid) {
+      return res.status(400).json({ message: "Invalid or expired OTP." });
+    }
+
+    // Mark user as verified
+    const user = await prisma.user.update({
+      where: { email },
+      data: { isVerified: true },
+    });
+
+    // Send welcome email after verification
+    sendWelcomeEmail(email, user.name || "partner", user.role);
+
+    res.status(200).json({ message: "Email verified successfully!" });
+  } catch (error) {
+    console.error("Error verifying OTP:", error);
+    res.status(500).json({ message: "Error verifying OTP!" });
+  }
+};
+
+const resendOtpController = async (
+  req: express.Request,
+  res: express.Response,
+) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required." });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const otp = generateOtp();
+    storeOtp(email, otp);
+    sendOtpEmail(email, user.name || "there", otp);
+
+    res.status(200).json({ message: "OTP resent!" });
+  } catch (error) {
+    console.error("Error resending OTP:", error);
+    res.status(500).json({ message: "Error resending OTP!" });
   }
 };
 
@@ -49,8 +121,8 @@ const loginController = async (req: express.Request, res: express.Response) => {
     const payload = { userId: user.id, email: user.email, role: user.role };
     const accessToken = generateAccessToken({ ...payload, type: "access" });
     const refreshToken = generateRefreshToken({ ...payload, type: "refresh" });
-    res.cookie("accessToken", accessToken)
-    res.cookie("refreshToken", refreshToken)
+    res.cookie("accessToken", accessToken, { httpOnly: true, secure: true, sameSite: "strict" });
+    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, sameSite: "strict" });
     res
     .status(200)
     .json({ message: "Login successful!", accessToken, refreshToken });
@@ -79,8 +151,10 @@ const refreshTokenController = async (
     const newAccessToken = generateAccessToken({
       userId: payload.userId,
       email: payload.email,
+      role: payload.role,
+      type: "access",
     });
-    res.cookie("accessToken", newAccessToken)
+    res.cookie("accessToken", newAccessToken, { httpOnly: true, secure: true, sameSite: "strict" });
     res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
     console.error("Error refreshing token:", error);
@@ -88,4 +162,4 @@ const refreshTokenController = async (
   }
 };
 
-export { signupController, loginController, refreshTokenController };
+export { signupController, verifyOtpController, resendOtpController, loginController, refreshTokenController };

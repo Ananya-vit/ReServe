@@ -1,10 +1,21 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { authAPI } from '../api/api'
+import LoadingButton from '../components/LoadingButton'
 
 const Auth = () => {
   const [mode, setMode] = useState('signup')
   const [forgotSent, setForgotSent] = useState(false)
   const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [passwordErrors, setPasswordErrors] = useState([])
+
+  useEffect(() => {
+    document.title = 'Sign In — ReServe'
+  }, [])
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
+  const [signupForm, setSignupForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'DONOR' })
 
   return (
     <div className="bg-white text-[#1A1A1A]">
@@ -111,7 +122,30 @@ const Auth = () => {
             </div>
 
             {mode === 'login' ? (
-              <form className="mt-6 space-y-5">
+              <form
+                className="mt-6 space-y-5"
+                onSubmit={async (e) => {
+                  e.preventDefault()
+                  try {
+                    setLoading(true)
+                    setError('')
+                    const response = await authAPI.login(loginForm.email, loginForm.password)
+                    localStorage.setItem('accessToken', response.accessToken)
+                    localStorage.setItem('refreshToken', response.refreshToken)
+                    const token = response.accessToken
+                    const role = token ? JSON.parse(atob(token.split('.')[1])).role : null
+                    if (localStorage.getItem('isOnboarded') === 'true') {
+                      navigate(role === 'NGO' ? '/claims' : '/donations')
+                    } else {
+                      navigate('/onboarding')
+                    }
+                  } catch (err) {
+                    setError(err.message || 'Login failed')
+                  } finally {
+                    setLoading(false)
+                  }
+                }}
+              >
                 <div>
                   <h2
                     className="text-2xl font-black text-gray-900"
@@ -127,6 +161,8 @@ const Auth = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="name@email.com"
                     type="email"
+                    value={loginForm.email}
+                    onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
                   />
                 </div>
                 <div>
@@ -135,6 +171,8 @@ const Auth = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="••••••••"
                     type="password"
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
                   />
                 </div>
                 <div className="flex items-center justify-between text-xs text-gray-500">
@@ -150,12 +188,14 @@ const Auth = () => {
                     Forgot password?
                   </button>
                 </div>
-                <button
-                  className="w-full rounded bg-[#1A1A1A] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white"
-                  type="button"
+                {error && <div className="rounded bg-red-100 p-2 text-xs text-red-700">{error}</div>}
+                <LoadingButton
+                  className="w-full rounded bg-[#1A1A1A] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white disabled:opacity-50"
+                  type="submit"
+                  loading={loading}
                 >
                   Continue
-                </button>
+                </LoadingButton>
                 <p className="text-center text-xs text-gray-500">
                   New here?{' '}
                   <button className="font-semibold text-[#F4A01C]" onClick={() => setMode('signup')} type="button">
@@ -168,9 +208,35 @@ const Auth = () => {
             {mode === 'signup' ? (
               <form
                 className="mt-6 space-y-5"
-                onSubmit={(event) => {
+                onSubmit={async (event) => {
                   event.preventDefault()
-                  navigate('/otp')
+                  try {
+                    const pwErrors = []
+                    if (signupForm.password.length < 8) pwErrors.push('Password must be at least 8 characters')
+                    if (!/[0-9]/.test(signupForm.password)) pwErrors.push('Password must contain at least one number')
+                    if (!/[!@#$%^&*(),.?":{}|<>]/.test(signupForm.password)) pwErrors.push('Password must contain at least one symbol')
+                    if (signupForm.password !== signupForm.confirmPassword) pwErrors.push('Passwords do not match')
+                    if (pwErrors.length > 0) {
+                      setPasswordErrors(pwErrors)
+                      return
+                    }
+                    setPasswordErrors([])
+                    setLoading(true)
+                    setError('')
+                    const response = await authAPI.signup(
+                      signupForm.name,
+                      signupForm.email,
+                      signupForm.password,
+                      signupForm.role
+                    )
+                    localStorage.setItem('accessToken', response.accessToken || '')
+                    localStorage.setItem('refreshToken', response.refreshToken || '')
+                    navigate('/otp', { state: { email: signupForm.email } })
+                  } catch (err) {
+                    setError(err.message || 'Signup failed')
+                  } finally {
+                    setLoading(false)
+                  }
                 }}
               >
                 <div>
@@ -183,11 +249,23 @@ const Auth = () => {
                   <p className="mt-1 text-xs text-gray-500">Start sharing or claiming surplus in minutes.</p>
                 </div>
                 <div>
+                  <label className="text-xs font-semibold text-gray-600">Full name</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    placeholder="Your name"
+                    type="text"
+                    value={signupForm.name}
+                    onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })}
+                  />
+                </div>
+                <div>
                   <label className="text-xs font-semibold text-gray-600">Email address</label>
                   <input
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="name@email.com"
                     type="email"
+                    value={signupForm.email}
+                    onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
                   />
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -197,6 +275,8 @@ const Auth = () => {
                       className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                       placeholder="Create a password"
                       type="password"
+                      value={signupForm.password}
+                      onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
                     />
                   </div>
                   <div>
@@ -205,6 +285,8 @@ const Auth = () => {
                       className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                       placeholder="Repeat password"
                       type="password"
+                      value={signupForm.confirmPassword}
+                      onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
                     />
                   </div>
                 </div>
@@ -212,14 +294,21 @@ const Auth = () => {
                   <label className="text-xs font-semibold text-gray-600">Role</label>
                   <div className="mt-2 grid gap-3 sm:grid-cols-2">
                     {[
-                      { value: 'donor', title: 'Donor', helper: 'Restaurants, caterers, event hosts' },
-                      { value: 'claimer', title: 'Claimer', helper: 'NGOs, shelters, community kitchens' }
+                      { value: 'DONOR', title: 'Donor', helper: 'Restaurants, caterers, event hosts' },
+                      { value: 'NGO', title: 'NGO', helper: 'NGOs, shelters, community kitchens' }
                     ].map((role) => (
                       <label
                         key={role.value}
                         className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-600 transition hover:border-[#F4A01C]"
                       >
-                        <input className="mt-1 h-4 w-4" name="role" type="radio" value={role.value} />
+                        <input
+                          className="mt-1 h-4 w-4"
+                          name="role"
+                          type="radio"
+                          value={role.value}
+                          checked={signupForm.role === role.value}
+                          onChange={(e) => setSignupForm({ ...signupForm, role: e.target.value })}
+                        />
                         <span>
                           <span className="block font-semibold text-gray-900">{role.title}</span>
                           <span className="block text-xs text-gray-500">{role.helper}</span>
@@ -231,16 +320,23 @@ const Auth = () => {
                 <div className="rounded-xl bg-[#F5F0E8]/60 px-4 py-3 text-xs text-gray-500">
                   Use at least 8 characters, one number, and one symbol.
                 </div>
+                {passwordErrors.length > 0 && (
+                  <div className="rounded bg-red-100 p-2 text-xs text-red-700">
+                    {passwordErrors.map((err, i) => <div key={i}>{err}</div>)}
+                  </div>
+                )}
                 <label className="flex items-center gap-2 text-xs text-gray-500">
                   <input className="h-4 w-4 rounded border-gray-300" type="checkbox" />
                   I agree to the Terms and Privacy Policy.
                 </label>
-                <button
-                  className="w-full rounded bg-[#F4A01C] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white"
+                {error && <div className="rounded bg-red-100 p-2 text-xs text-red-700">{error}</div>}
+                <LoadingButton
+                  className="w-full rounded bg-[#F4A01C] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white disabled:opacity-50"
                   type="submit"
+                  loading={loading}
                 >
                   Create account
-                </button>
+                </LoadingButton>
                 <p className="text-center text-xs text-gray-500">
                   Already have an account?{' '}
                   <button className="font-semibold text-[#F4A01C]" onClick={() => setMode('login')} type="button">

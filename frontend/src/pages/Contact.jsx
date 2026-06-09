@@ -1,7 +1,26 @@
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const Contact = () => {
+  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [sent, setSent] = useState(false)
+  const [sending, setSending] = useState(false)
+
+  useEffect(() => {
+    document.title = 'Contact — ReServe'
+  }, [])
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.name || !form.email || !form.message) return
+    setSending(true)
+    // Simulate sending (backend contact endpoint not yet implemented)
+    await new Promise((r) => setTimeout(r, 800))
+    setSending(false)
+    setSent(true)
+    setForm({ name: '', email: '', message: '' })
+  }
+
   return (
     <div className="bg-white text-[#1A1A1A]">
       <section className="relative overflow-hidden bg-white">
@@ -68,37 +87,53 @@ const Contact = () => {
             >
               Send us a message
             </h2>
-            <form className="mt-6 space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-gray-600">Full name</label>
-                <input
-                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="Your name"
-                  type="text"
-                />
+            {sent ? (
+              <div className="mt-6 rounded-xl bg-[#4CAF50]/10 px-4 py-3 text-xs text-[#2f7a33]">
+                Message sent! We will get back to you shortly.
               </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600">Email address</label>
-                <input
-                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="name@email.com"
-                  type="email"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600">Message</label>
-                <textarea
-                  className="mt-2 min-h-[140px] w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="Tell us how we can help."
-                />
-              </div>
-              <button
-                className="w-full rounded bg-[#1A1A1A] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white"
-                type="button"
-              >
-                Send message
-              </button>
-            </form>
+            ) : (
+              <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Full name</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    placeholder="Your name"
+                    type="text"
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Email address</label>
+                  <input
+                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    placeholder="name@email.com"
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600">Message</label>
+                  <textarea
+                    className="mt-2 min-h-[140px] w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                    placeholder="Tell us how we can help."
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    required
+                  />
+                </div>
+                <button
+                  className="w-full rounded bg-[#1A1A1A] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white disabled:opacity-50"
+                  type="submit"
+                  disabled={sending}
+                >
+                  {sending ? 'Sending...' : 'Send message'}
+                </button>
+              </form>
+            )}
           </div>
 
           <aside className="space-y-6">

@@ -1,344 +1,64 @@
-import React, { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-
-const claimDonationsSeed = [
-  {
-    id: 101,
-    donor: 'Tola Kitchen',
-    item: 'Rice and beans trays',
-    quantity: '30 trays',
-    location: 'Lekki, Lagos',
-    pickupWindow: '12:00 PM - 3:00 PM',
-    postedAt: 'Today, 7:45 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=700&q=80'
-  },
-  {
-    id: 102,
-    donor: 'Oasis Bakery',
-    item: 'Fresh bread loaves',
-    quantity: '45 loaves',
-    location: 'Surulere, Lagos',
-    pickupWindow: '6:00 AM - 10:00 AM',
-    postedAt: 'Today, 6:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80'
-  },
-  {
-    id: 103,
-    donor: 'Green Harvest',
-    item: 'Vegetable sacks',
-    quantity: '14 sacks',
-    location: 'Agege, Lagos',
-    pickupWindow: '7:00 AM - 11:00 AM',
-    postedAt: 'Today, 6:30 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=700&q=80'
-  },
-  {
-    id: 104,
-    donor: 'Fresh Catch',
-    item: 'Fish baskets',
-    quantity: '8 baskets',
-    location: 'Badagry, Lagos',
-    pickupWindow: '8:00 AM - 12:00 PM',
-    postedAt: 'Today, 7:15 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1522184216316-2d2a3c5d52b4?w=700&q=80'
-  },
-  {
-    id: 105,
-    donor: 'Sunrise Farms',
-    item: 'Fresh oranges',
-    quantity: '26 bags',
-    location: 'Epe, Lagos',
-    pickupWindow: '8:00 AM - 1:00 PM',
-    postedAt: 'Today, 7:40 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=700&q=80'
-  },
-  {
-    id: 106,
-    donor: 'Community Cooks',
-    item: 'Chicken stew bowls',
-    quantity: '18 bowls',
-    location: 'Ajah, Lagos',
-    pickupWindow: '2:00 PM - 6:00 PM',
-    postedAt: 'Today, 9:20 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=700&q=80'
-  },
-  {
-    id: 107,
-    donor: 'Hopeful Hands',
-    item: 'Mixed salad trays',
-    quantity: '12 trays',
-    location: 'Victoria Island, Lagos',
-    pickupWindow: '11:00 AM - 2:00 PM',
-    postedAt: 'Today, 8:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1543362906-acfc16c67564?w=700&q=80'
-  },
-  {
-    id: 108,
-    donor: 'Milk Station',
-    item: 'Yogurt cups',
-    quantity: '60 cups',
-    location: 'Ikeja, Lagos',
-    pickupWindow: '10:00 AM - 2:00 PM',
-    postedAt: 'Today, 7:35 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=700&q=80'
-  },
-  {
-    id: 109,
-    donor: 'Pantry Plus',
-    item: 'Whole grain cereal',
-    quantity: '40 boxes',
-    location: 'Maryland, Lagos',
-    pickupWindow: '9:00 AM - 5:00 PM',
-    postedAt: 'Yesterday, 3:50 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=700&q=80'
-  },
-  {
-    id: 110,
-    donor: 'Plantain Hub',
-    item: 'Beans and plantain',
-    quantity: '20 plates',
-    location: 'Festac, Lagos',
-    pickupWindow: '3:00 PM - 6:00 PM',
-    postedAt: 'Today, 10:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=700&q=80'
-  },
-  {
-    id: 111,
-    donor: 'Market Circle',
-    item: 'Tomato crates',
-    quantity: '18 crates',
-    location: 'Oshodi, Lagos',
-    pickupWindow: '7:00 AM - 11:00 AM',
-    postedAt: 'Today, 6:00 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&q=80'
-  },
-  {
-    id: 112,
-    donor: 'Water Aid',
-    item: 'Packaged water cartons',
-    quantity: '48 cartons',
-    location: 'Apapa, Lagos',
-    pickupWindow: '9:00 AM - 6:00 PM',
-    postedAt: 'Yesterday, 1:20 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=700&q=80'
-  },
-  {
-    id: 113,
-    donor: 'Kitchen Bloom',
-    item: 'Pasta family packs',
-    quantity: '16 packs',
-    location: 'Gbagada, Lagos',
-    pickupWindow: '1:00 PM - 4:00 PM',
-    postedAt: 'Today, 8:05 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1523986371872-9d3ba2e2f5cd?w=700&q=80'
-  },
-  {
-    id: 114,
-    donor: 'Bright Start',
-    item: 'Baby cereal packs',
-    quantity: '28 packs',
-    location: 'Ojodu, Lagos',
-    pickupWindow: '10:00 AM - 4:00 PM',
-    postedAt: 'Yesterday, 4:30 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=700&q=80'
-  },
-  {
-    id: 115,
-    donor: 'Harvest Basket',
-    item: 'Fresh fruit baskets',
-    quantity: '20 baskets',
-    location: 'Yaba, Lagos',
-    pickupWindow: '9:00 AM - 1:00 PM',
-    postedAt: 'Yesterday, 6:20 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&q=80'
-  },
-  {
-    id: 116,
-    donor: 'Protein Hub',
-    item: 'Chicken shawarma wraps',
-    quantity: '20 wraps',
-    location: 'Ikorodu, Lagos',
-    pickupWindow: '12:00 PM - 3:00 PM',
-    postedAt: 'Today, 9:30 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1529563021893-cc83c992d75d?w=700&q=80'
-  },
-  {
-    id: 117,
-    donor: 'Nutrition Plus',
-    item: 'Beans sacks',
-    quantity: '10 sacks',
-    location: 'Mushin, Lagos',
-    pickupWindow: '9:00 AM - 1:00 PM',
-    postedAt: 'Yesterday, 2:15 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&q=80'
-  },
-  {
-    id: 118,
-    donor: 'Care Kitchen',
-    item: 'Vegetable stew pack',
-    quantity: '14 boxes',
-    location: 'Ikoyi, Lagos',
-    pickupWindow: '4:00 PM - 7:00 PM',
-    postedAt: 'Today, 9:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1546069901-eacef0df6022?w=700&q=80'
-  }
-]
-
-const myClaimsSeed = [
-  {
-    id: 'CL-1001',
-    ngo: 'Bright Future NGO',
-    item: 'Rice and beans trays',
-    quantity: '15 trays',
-    pickupDate: 'Jun 2, 2026',
-    status: 'Scheduled'
-  },
-  {
-    id: 'CL-1002',
-    ngo: 'Hope Kitchen',
-    item: 'Fresh bread loaves',
-    quantity: '20 loaves',
-    pickupDate: 'Jun 1, 2026',
-    status: 'Confirmed'
-  },
-  {
-    id: 'CL-1003',
-    ngo: 'Child Care Network',
-    item: 'Vegetable sacks',
-    quantity: '6 sacks',
-    pickupDate: 'Jun 3, 2026',
-    status: 'Pending'
-  },
-  {
-    id: 'CL-1004',
-    ngo: 'Meals on Wheels',
-    item: 'Chicken stew bowls',
-    quantity: '10 bowls',
-    pickupDate: 'Jun 1, 2026',
-    status: 'Confirmed'
-  },
-  {
-    id: 'CL-1005',
-    ngo: 'Kids First',
-    item: 'Yogurt cups',
-    quantity: '24 cups',
-    pickupDate: 'Jun 4, 2026',
-    status: 'Pending'
-  },
-  {
-    id: 'CL-1006',
-    ngo: 'Care Circle',
-    item: 'Pasta family packs',
-    quantity: '8 packs',
-    pickupDate: 'Jun 2, 2026',
-    status: 'Scheduled'
-  },
-  {
-    id: 'CL-1007',
-    ngo: 'Safe Haven',
-    item: 'Tomato crates',
-    quantity: '10 crates',
-    pickupDate: 'Jun 5, 2026',
-    status: 'Pending'
-  },
-  {
-    id: 'CL-1008',
-    ngo: 'Feed Lagos',
-    item: 'Fresh fruit baskets',
-    quantity: '8 baskets',
-    pickupDate: 'Jun 3, 2026',
-    status: 'Confirmed'
-  },
-  {
-    id: 'CL-1009',
-    ngo: 'Community Relief',
-    item: 'Beans sacks',
-    quantity: '4 sacks',
-    pickupDate: 'Jun 6, 2026',
-    status: 'Pending'
-  },
-  {
-    id: 'CL-1010',
-    ngo: 'Hope Kitchen',
-    item: 'Packaged water cartons',
-    quantity: '12 cartons',
-    pickupDate: 'Jun 2, 2026',
-    status: 'Scheduled'
-  },
-  {
-    id: 'CL-1011',
-    ngo: 'Bright Future NGO',
-    item: 'Baby cereal packs',
-    quantity: '10 packs',
-    pickupDate: 'Jun 4, 2026',
-    status: 'Confirmed'
-  },
-  {
-    id: 'CL-1012',
-    ngo: 'Food For All',
-    item: 'Fresh oranges',
-    quantity: '12 bags',
-    pickupDate: 'Jun 5, 2026',
-    status: 'Pending'
-  }
-]
+import { useMemo, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { donationAPI, claimAPI } from '../api/api'
+import LoadingButton from '../components/LoadingButton'
 
 const Claim = () => {
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    navigate('/auth')
+  }
   const [page, setPage] = useState(1)
   const [isClaimsOpen, setIsClaimsOpen] = useState(false)
   const [claimsPage, setClaimsPage] = useState(1)
   const [isClaimFormOpen, setIsClaimFormOpen] = useState(false)
   const [selectedDonation, setSelectedDonation] = useState(null)
   const [claimSent, setClaimSent] = useState(false)
+  const [donations, setDonations] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [myClaims, setMyClaims] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [claimForm, setClaimForm] = useState({
-    ngoName: '',
-    contactPhone: '',
     pickupDate: '',
     quantity: '',
-    message: ''
   })
+  const [claimSubmitting, setClaimSubmitting] = useState(false)
+  const [cancellingClaimId, setCancellingClaimId] = useState(null)
   const pageSize = 6
   const claimsPageSize = 5
 
-  const totalPages = Math.ceil(claimDonationsSeed.length / pageSize)
-  const totalClaimsPages = Math.ceil(myClaimsSeed.length / claimsPageSize)
+  useEffect(() => {
+    document.title = 'Claim Surplus — ReServe'
+  }, [])
 
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * pageSize
-    return claimDonationsSeed.slice(start, start + pageSize)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const donResponse = await donationAPI.getAll(page, pageSize)
+        setDonations(donResponse.donations || [])
+        setTotalCount(donResponse.totalCount || 0)
+
+        const claimsResponse = await claimAPI.getMyClaims()
+        setMyClaims(claimsResponse.claims || [])
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
   }, [page])
-
-  const claimsPageItems = useMemo(() => {
-    const start = (claimsPage - 1) * claimsPageSize
-    return myClaimsSeed.slice(start, start + claimsPageSize)
-  }, [claimsPage])
 
   const handleOpenClaimForm = (donation) => {
     setSelectedDonation(donation)
     setClaimForm({
-      ngoName: '',
-      contactPhone: '',
       pickupDate: '',
-      quantity: donation.quantity,
-      message: ''
+      quantity: '',
     })
     setClaimSent(false)
     setIsClaimFormOpen(true)
@@ -355,10 +75,60 @@ const Claim = () => {
     setClaimForm((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleClaimSubmit = (event) => {
+  const handleClaimSubmit = async (event) => {
     event.preventDefault()
-    setClaimSent(true)
+    try {
+      setClaimSubmitting(true)
+      setError('')
+      const qty = Number(claimForm.quantity)
+      if (!qty || qty <= 0) {
+        setError('Please enter a valid quantity.')
+        setClaimSubmitting(false)
+        return
+      }
+      if (qty > (selectedDonation?.quantity || 0)) {
+        setError(`Only ${selectedDonation?.quantity} items available.`)
+        setClaimSubmitting(false)
+        return
+      }
+      await claimAPI.create({
+        donationId: selectedDonation.id,
+        quantity: qty,
+        scheduledPickup: claimForm.pickupDate,
+      })
+      setClaimSent(true)
+      const response = await claimAPI.getMyClaims()
+      setMyClaims(response.claims || [])
+      const donResponse = await donationAPI.getAll(page, pageSize)
+      setDonations(donResponse.donations || [])
+      setTotalCount(donResponse.totalCount || 0)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setClaimSubmitting(false)
+    }
   }
+
+  const handleCancelClaim = async (claimId) => {
+    try {
+      setCancellingClaimId(claimId)
+      await claimAPI.cancel(claimId, 'Cancelled by NGO')
+      const response = await claimAPI.getMyClaims()
+      setMyClaims(response.claims || [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCancellingClaimId(null)
+    }
+  }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+  const totalClaimsPages = Math.max(1, Math.ceil(myClaims.length / claimsPageSize))
+
+  const claimsPageItems = useMemo(() => {
+    const start = (claimsPage - 1) * claimsPageSize
+    return myClaims.slice(start, start + claimsPageSize)
+  }, [claimsPage, myClaims])
 
   return (
     <div className="bg-white text-[#1A1A1A]">
@@ -385,12 +155,34 @@ const Claim = () => {
             </svg>
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
           </Link>
-          <Link
-            className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            to="/onboarding"
-          >
-            User Name
-          </Link>
+          <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
+            <Link className="hover:opacity-70" to="/">
+              Home
+            </Link>
+            <Link className="hover:opacity-70 font-semibold text-gray-900" to="/claims">
+              Claims
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="group relative">
+              <button
+                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white"
+                type="button"
+              >
+                <span className="text-xs font-semibold text-gray-600">RS</span>
+              </button>
+              <div className="invisible absolute z-50 right-0 top-full w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
+                <div className="rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg">
+                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to={localStorage.getItem('isOnboarded') === 'true' ? '/profile' : '/onboarding'}>
+                    Profile
+                  </Link>
+                  <button onClick={handleLogout} className="block w-full text-left rounded-lg px-3 py-2 hover:bg-gray-50">
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
       </section>
 
@@ -420,102 +212,102 @@ const Claim = () => {
 
       <section className="bg-[#F5F0E8]/40 py-10">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {pageItems.map((item) => (
-              <article key={item.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                <div className="relative h-[180px]">
-                  <img alt={item.item} className="h-full w-full object-cover" src={item.image} />
-                  <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700">
-                    {item.status}
-                  </span>
-                </div>
-                <div className="space-y-3 px-5 py-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{item.item}</h3>
-                      <p className="text-xs text-gray-400">Donor: {item.donor}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-black text-[#1A1A1A]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        {item.quantity}
-                      </p>
-                      <p className="text-xs text-gray-400">Available</p>
-                    </div>
-                  </div>
-                  <div className="grid gap-2 text-xs text-gray-500">
-                    <div className="flex items-center justify-between">
-                      <span>Pickup window</span>
-                      <span className="font-medium text-gray-700">{item.pickupWindow}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Location</span>
-                      <span className="font-medium text-gray-700">{item.location}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-400">
-                    <span>Posted</span>
-                    <span>{item.postedAt}</span>
-                  </div>
-                  <button
-                    className="w-full rounded border border-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
-                    onClick={() => handleOpenClaimForm(item)}
-                    type="button"
-                  >
-                    Claim food
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-gray-500">
-              Showing {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, claimDonationsSeed.length)} of{' '}
-              {claimDonationsSeed.length} donations
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={page === 1}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                type="button"
-              >
-                Prev
-              </button>
-              {Array.from({ length: totalPages }).map((_, index) => {
-                const value = index + 1
-                const isActive = value === page
-                return (
-                  <button
-                    key={value}
-                    className={`rounded px-3 py-2 text-xs transition ${
-                      isActive
-                        ? 'bg-[#1A1A1A] text-white'
-                        : 'border border-gray-300 text-gray-600 hover:bg-white'
-                    }`}
-                    onClick={() => setPage(value)}
-                    type="button"
-                  >
-                    {value}
-                  </button>
-                )
-              })}
-              <button
-                className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={page === totalPages}
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                type="button"
-              >
-                Next
-              </button>
+          {loading ? (
+            <div className="text-center text-gray-500">Loading donations...</div>
+          ) : error ? (
+            <div className="text-center text-red-500">{error}</div>
+          ) : donations.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-lg font-semibold text-gray-700">No donations available</p>
+              <p className="mt-2 text-sm text-gray-400">Check back soon for new surplus listings.</p>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {donations.map((item) => (
+                  <article key={item.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
+                    <div className="relative h-[180px] bg-gray-200">
+                      {item.images?.[0]?.imageUrl ? (
+                        <img alt={item.foodName} className="h-full w-full object-cover" src={item.images[0].imageUrl} />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-gray-400">No image</div>
+                      )}
+                      <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700">
+                        {item.status}
+                      </span>
+                    </div>
+                    <div className="space-y-3 px-5 py-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">{item.foodName}</h3>
+                          <p className="text-xs text-gray-400">{item.donor?.name || 'Anonymous'}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-black text-[#1A1A1A]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            {item.quantity}
+                          </p>
+                          <p className="text-xs text-gray-400">items left</p>
+                        </div>
+                      </div>
+                      <div className="grid gap-2 text-xs text-gray-500">
+                        <div className="flex items-center justify-between">
+                          <span>Pickup deadline</span>
+                          <span className="font-medium text-gray-700">{new Date(item.pickupDeadline).toLocaleDateString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Location</span>
+                          <span className="font-medium text-gray-700">{item.pickupLocation?.city || 'N/A'}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-400">
+                        <span>Posted</span>
+                        <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <button
+                        className="w-full rounded border border-[#1A1A1A] px-4 py-2 text-xs uppercase tracking-[0.12em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
+                        onClick={() => handleOpenClaimForm(item)}
+                        type="button"
+                      >
+                        Claim food
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-xs text-gray-500">
+                  {totalCount > 0
+                    ? `Showing ${(page - 1) * pageSize + 1} - ${Math.min(page * pageSize, totalCount)} of ${totalCount} donations`
+                    : 'No donations found'}
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={page === 1}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                    type="button"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={page === totalPages}
+                    onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                    type="button"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
       {isClaimsOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
-          <div className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h2
@@ -532,85 +324,89 @@ const Claim = () => {
             </div>
 
             <div className="mt-6 space-y-4">
-              {claimsPageItems.map((claim) => (
+               {claimsPageItems.length === 0 ? (
+                <p className="text-center py-8 text-sm text-gray-400">No claims yet.</p>
+              ) : claimsPageItems.map((claim) => (
                 <div key={claim.id} className="rounded-xl border border-gray-100 px-4 py-4">
                   <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                    <div>
-                      <p className="text-xs font-semibold text-gray-400">{claim.id}</p>
-                      <h3 className="text-base font-semibold text-gray-900">{claim.item}</h3>
-                      <p className="text-xs text-gray-400">NGO: {claim.ngo}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold text-gray-400">Claim #{claim.id}</p>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            claim.status === 'PICKED_UP'
+                              ? 'bg-blue-100 text-blue-800'
+                              : claim.status === 'ACCEPTED'
+                              ? 'bg-[#F4A01C]/15 text-[#b26f0b]'
+                              : claim.status === 'REJECTED'
+                              ? 'bg-red-100 text-red-800'
+                              : claim.status === 'PENDING'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : claim.status === 'COMPLETED'
+                              ? 'bg-[#4CAF50]/15 text-[#2f7a33]'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {claim.status}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900 mt-1">{claim.donation?.foodName}</h3>
+                      <p className="text-xs text-gray-400">From: {claim.donation?.donor?.name || 'Anonymous'}</p>
+                      <p className="text-xs text-gray-400">Pickup: {claim.scheduledPickup ? new Date(claim.scheduledPickup).toLocaleDateString() : 'TBD'}</p>
                     </div>
                     <div className="text-sm text-gray-600">
                       <p>
-                        <span className="font-semibold text-gray-800">{claim.quantity}</span> reserved
+                        <span className="font-semibold text-gray-800">{claim.quantity || 0}</span> / {claim.donation?.quantity || 0} qty
                       </p>
-                      <p className="text-xs text-gray-400">Pickup: {claim.pickupDate}</p>
                     </div>
-                    <span
-                      className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${
-                        claim.status === 'Confirmed'
-                          ? 'bg-[#4CAF50]/15 text-[#2f7a33]'
-                          : claim.status === 'Scheduled'
-                          ? 'bg-[#F4A01C]/15 text-[#b26f0b]'
-                          : 'bg-gray-100 text-gray-600'
-                      }`}
-                    >
-                      {claim.status}
-                    </span>
+                    {(claim.status === 'PENDING' || claim.status === 'ACCEPTED') && (
+                      <LoadingButton
+                        className="rounded border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                        loading={cancellingClaimId === claim.id}
+                        onClick={() => handleCancelClaim(claim.id)}
+                        type="button"
+                      >
+                        Cancel
+                      </LoadingButton>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-              <p className="text-xs text-gray-500">
-                Showing {(claimsPage - 1) * claimsPageSize + 1} -{' '}
-                {Math.min(claimsPage * claimsPageSize, myClaimsSeed.length)} of {myClaimsSeed.length} claims
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                  disabled={claimsPage === 1}
-                  onClick={() => setClaimsPage((prev) => Math.max(1, prev - 1))}
-                  type="button"
-                >
-                  Prev
-                </button>
-                {Array.from({ length: totalClaimsPages }).map((_, index) => {
-                  const value = index + 1
-                  const isActive = value === claimsPage
-                  return (
-                    <button
-                      key={value}
-                      className={`rounded px-3 py-2 text-xs transition ${
-                        isActive
-                          ? 'bg-[#1A1A1A] text-white'
-                          : 'border border-gray-300 text-gray-600 hover:bg-white'
-                      }`}
-                      onClick={() => setClaimsPage(value)}
-                      type="button"
-                    >
-                      {value}
-                    </button>
-                  )
-                })}
-                <button
-                  className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                  disabled={claimsPage === totalClaimsPages}
-                  onClick={() => setClaimsPage((prev) => Math.min(totalClaimsPages, prev + 1))}
-                  type="button"
-                >
-                  Next
-                </button>
+            {myClaims.length > 0 && (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-xs text-gray-500">
+                  Showing {(claimsPage - 1) * claimsPageSize + 1} -{' '}
+                  {Math.min(claimsPage * claimsPageSize, myClaims.length)} of {myClaims.length} claims
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={claimsPage === 1}
+                    onClick={() => setClaimsPage((prev) => Math.max(1, prev - 1))}
+                    type="button"
+                  >
+                    Prev
+                  </button>
+                  <button
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={claimsPage === totalClaimsPages}
+                    onClick={() => setClaimsPage((prev) => Math.min(totalClaimsPages, prev + 1))}
+                    type="button"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       ) : null}
 
       {isClaimFormOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h2
@@ -620,7 +416,7 @@ const Claim = () => {
                   Claim request
                 </h2>
                 <p className="mt-1 text-xs text-gray-500">
-                  {selectedDonation ? `${selectedDonation.item} from ${selectedDonation.donor}` : 'Requesting a claim'}
+                  {selectedDonation ? `${selectedDonation.foodName} from ${selectedDonation.donor?.name || 'Anonymous'}` : 'Requesting a claim'}
                 </p>
               </div>
               <button className="text-sm text-gray-400 hover:text-gray-700" onClick={handleCloseClaimForm}>
@@ -629,62 +425,35 @@ const Claim = () => {
             </div>
 
             <form className="mt-6 space-y-4" onSubmit={handleClaimSubmit}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <label className="text-xs font-semibold text-gray-600">NGO name</label>
-                  <input
-                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                    name="ngoName"
-                    onChange={handleClaimChange}
-                    placeholder="Your organization"
-                    type="text"
-                    value={claimForm.ngoName}
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-600">Contact phone</label>
-                  <input
-                    className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                    name="contactPhone"
-                    onChange={handleClaimChange}
-                    placeholder="+234 801 000 0000"
-                    type="tel"
-                    value={claimForm.contactPhone}
-                  />
-                </div>
+              <div className="rounded-xl bg-[#F5F0E8]/50 px-4 py-3 text-sm text-gray-700">
+                Available: <span className="font-bold text-[#1A1A1A]">{selectedDonation?.quantity || 0}</span> items
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-xs font-semibold text-gray-600">Preferred pickup date</label>
+                  <label className="text-xs font-semibold text-gray-600">When can you pick up?</label>
                   <input
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     name="pickupDate"
                     onChange={handleClaimChange}
-                    type="date"
+                    type="datetime-local"
                     value={claimForm.pickupDate}
+                    required
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600">Quantity requested</label>
+                  <label className="text-xs font-semibold text-gray-600">Quantity needed</label>
                   <input
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     name="quantity"
                     onChange={handleClaimChange}
-                    placeholder="e.g. 12 trays"
-                    type="text"
+                    placeholder="e.g. 20"
+                    type="number"
+                    min="1"
+                    max={selectedDonation?.quantity || 1}
                     value={claimForm.quantity}
+                    required
                   />
                 </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600">Message to donor</label>
-                <textarea
-                  className="mt-2 min-h-[120px] w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  name="message"
-                  onChange={handleClaimChange}
-                  placeholder="Share pickup details, team size, or storage needs."
-                  value={claimForm.message}
-                />
               </div>
 
               {claimSent ? (
@@ -693,13 +462,16 @@ const Claim = () => {
                 </div>
               ) : null}
 
+              {error && <div className="rounded bg-red-100 p-2 text-xs text-red-700">{error}</div>}
+
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  className="rounded bg-[#1A1A1A] px-5 py-3 text-xs uppercase tracking-[0.2em] text-white"
-                  type="submit"
-                >
-                  Send claim
-                </button>
+                  <LoadingButton
+                    className="rounded bg-[#1A1A1A] px-5 py-3 text-xs uppercase tracking-[0.2em] text-white disabled:opacity-50"
+                    type="submit"
+                    loading={claimSubmitting}
+                  >
+                    Send claim
+                  </LoadingButton>
                 <button
                   className="text-xs font-semibold text-[#F4A01C]"
                   onClick={handleCloseClaimForm}

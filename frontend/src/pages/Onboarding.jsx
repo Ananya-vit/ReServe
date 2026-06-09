@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo, useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { userAPI, locationAPI } from '../api/api'
+import LoadingButton from '../components/LoadingButton'
 
 const steps = [
   {
@@ -25,9 +27,38 @@ const steps = [
 ]
 
 const Onboarding = () => {
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    navigate('/auth')
+  }
   const [stepIndex, setStepIndex] = useState(0)
+  const [saving, setSaving] = useState(false)
   const currentStep = steps[stepIndex]
   const progress = useMemo(() => ((stepIndex + 1) / steps.length) * 100, [stepIndex])
+
+  // Persistent form state across steps
+  const [profileData, setProfileData] = useState({
+    orgName: '',
+    primaryContact: '',
+    avatar: null,
+    orgSummary: ''
+  })
+  const [contactData, setContactData] = useState({
+    phone: '',
+    pickupLocation: '',
+    pickupInstructions: ''
+  })
+  const [verificationData, setVerificationData] = useState({
+    verificationPdf: null,
+    foodSafetyPermit: null,
+    additionalNotes: ''
+  })
+
+  useEffect(() => {
+    document.title = 'Onboarding — ReServe'
+  }, [])
 
   return (
     <div className="bg-white text-[#1A1A1A]">
@@ -65,12 +96,26 @@ const Onboarding = () => {
               Claims
             </Link>
           </div>
-          <Link
-            className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            to="/donations"
-          >
-            List surplus
-          </Link>
+          <div className="flex items-center gap-3">
+              <div className="group relative">
+                <button
+                  className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white"
+                  type="button"
+                >
+                  <span className="text-xs font-semibold text-gray-600">RS</span>
+                </button>
+                <div className="invisible absolute z-50 right-0 top-full w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
+                  <div className="rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg">
+                    <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to={localStorage.getItem('isOnboarded') === 'true' ? '/profile' : '/onboarding'}>
+                      Profile
+                    </Link>
+                    <button onClick={handleLogout} className="block w-full text-left rounded-lg px-3 py-2 hover:bg-gray-50">
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+          </div>
         </nav>
       </section>
 
@@ -135,6 +180,8 @@ const Onboarding = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Sunrise Catering, Bella Bistro, or Hope Kitchen"
                     type="text"
+                    value={profileData.orgName}
+                    onChange={(e) => setProfileData({ ...profileData, orgName: e.target.value })}
                   />
                 </div>
                 <div>
@@ -143,6 +190,8 @@ const Onboarding = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Operations or kitchen lead"
                     type="text"
+                    value={profileData.primaryContact}
+                    onChange={(e) => setProfileData({ ...profileData, primaryContact: e.target.value })}
                   />
                 </div>
                 <div>
@@ -150,6 +199,7 @@ const Onboarding = () => {
                   <input
                     className="mt-2 w-full rounded border border-dashed border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     type="file"
+                    onChange={(e) => setProfileData({ ...profileData, avatar: e.target.files[0] || null })}
                   />
                 </div>
                 <div>
@@ -157,6 +207,8 @@ const Onboarding = () => {
                   <textarea
                     className="mt-2 h-24 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Share your mission or the types of surplus you handle"
+                    value={profileData.orgSummary}
+                    onChange={(e) => setProfileData({ ...profileData, orgSummary: e.target.value })}
                   />
                 </div>
               </form>
@@ -170,6 +222,8 @@ const Onboarding = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="+234 801 000 0000"
                     type="tel"
+                    value={contactData.phone}
+                    onChange={(e) => setContactData({ ...contactData, phone: e.target.value })}
                   />
                 </div>
                 <div>
@@ -178,6 +232,8 @@ const Onboarding = () => {
                     className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Ikoyi, Lagos"
                     type="text"
+                    value={contactData.pickupLocation}
+                    onChange={(e) => setContactData({ ...contactData, pickupLocation: e.target.value })}
                   />
                 </div>
                 <div>
@@ -185,6 +241,8 @@ const Onboarding = () => {
                   <textarea
                     className="mt-2 h-24 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Gate access, loading bay, or security notes"
+                    value={contactData.pickupInstructions}
+                    onChange={(e) => setContactData({ ...contactData, pickupInstructions: e.target.value })}
                   />
                 </div>
               </form>
@@ -197,6 +255,7 @@ const Onboarding = () => {
                   <input
                     className="mt-2 w-full rounded border border-dashed border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     type="file"
+                    onChange={(e) => setVerificationData({ ...verificationData, verificationPdf: e.target.files[0] || null })}
                   />
                 </div>
                 <div>
@@ -204,6 +263,7 @@ const Onboarding = () => {
                   <input
                     className="mt-2 w-full rounded border border-dashed border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     type="file"
+                    onChange={(e) => setVerificationData({ ...verificationData, foodSafetyPermit: e.target.files[0] || null })}
                   />
                 </div>
                 <div>
@@ -211,6 +271,8 @@ const Onboarding = () => {
                   <textarea
                     className="mt-2 h-24 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                     placeholder="Share anything we should know about handling or storage"
+                    value={verificationData.additionalNotes}
+                    onChange={(e) => setVerificationData({ ...verificationData, additionalNotes: e.target.value })}
                   />
                 </div>
               </form>
@@ -244,12 +306,45 @@ const Onboarding = () => {
                     Next step
                   </button>
                 ) : (
-                  <Link
-                    className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.12em] text-white"
-                    to="/donations"
+                  <LoadingButton
+                    className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.12em] text-white disabled:opacity-50"
+                    onClick={async () => {
+                      setSaving(true)
+                      try {
+                        const token = localStorage.getItem('accessToken')
+                        if (token) {
+                          const payload = JSON.parse(atob(token.split('.')[1]))
+                          const updateData = {}
+                          if (profileData.orgName) updateData.name = profileData.orgName
+                          if (contactData.phone) updateData.phone = contactData.phone
+                          if (Object.keys(updateData).length > 0) {
+                            await userAPI.update(payload.userId, updateData)
+                          }
+                          if (contactData.pickupLocation) {
+                            await locationAPI.addPickup({
+                              address: contactData.pickupLocation,
+                              city: '',
+                              state: '',
+                              pincode: '',
+                            })
+                          }
+                        }
+                        localStorage.setItem('isOnboarded', 'true')
+                        const tok = localStorage.getItem('accessToken')
+                        const userRole = tok ? JSON.parse(atob(tok.split('.')[1])).role : null
+                        navigate(userRole === 'NGO' ? '/claims' : '/donations')
+                      } catch {
+                        localStorage.setItem('isOnboarded', 'true')
+                        const tok = localStorage.getItem('accessToken')
+                        const userRole = tok ? JSON.parse(atob(tok.split('.')[1])).role : null
+                        navigate(userRole === 'NGO' ? '/claims' : '/donations')
+                      }
+                    }}
+                    loading={saving}
+                    type="button"
                   >
                     Go to dashboard
-                  </Link>
+                  </LoadingButton>
                 )}
               </div>
             </div>

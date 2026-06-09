@@ -1,253 +1,224 @@
-import React, { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-
-const donationsSeed = [
-  {
-    id: 1,
-    title: 'Vegetable stew pack',
-    category: 'Cooked meals',
-    quantity: 12,
-    unit: 'boxes',
-    freshness: 'Prepared today',
-    pickupWindow: '4:00 PM - 7:00 PM',
-    location: 'Ikoyi, Lagos',
-    postedAt: 'Today, 9:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1546069901-eacef0df6022?w=700&q=80'
-  },
-  {
-    id: 2,
-    title: 'Rice and beans',
-    category: 'Cooked meals',
-    quantity: 24,
-    unit: 'plates',
-    freshness: 'Prepared today',
-    pickupWindow: '12:00 PM - 3:00 PM',
-    location: 'Lekki, Lagos',
-    postedAt: 'Today, 8:40 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=700&q=80'
-  },
-  {
-    id: 3,
-    title: 'Fresh fruit basket',
-    category: 'Fresh produce',
-    quantity: 18,
-    unit: 'baskets',
-    freshness: 'Picked yesterday',
-    pickupWindow: '9:00 AM - 1:00 PM',
-    location: 'Yaba, Lagos',
-    postedAt: 'Yesterday, 6:20 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&q=80'
-  },
-  {
-    id: 4,
-    title: 'Bakery bread loaves',
-    category: 'Bakery',
-    quantity: 40,
-    unit: 'loaves',
-    freshness: 'Baked today',
-    pickupWindow: '6:00 AM - 10:00 AM',
-    location: 'Surulere, Lagos',
-    postedAt: 'Today, 5:30 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&q=80'
-  },
-  {
-    id: 5,
-    title: 'Yogurt cups',
-    category: 'Dairy',
-    quantity: 60,
-    unit: 'cups',
-    freshness: 'Expires in 5 days',
-    pickupWindow: '10:00 AM - 2:00 PM',
-    location: 'Ikeja, Lagos',
-    postedAt: 'Today, 7:15 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=700&q=80'
-  },
-  {
-    id: 6,
-    title: 'Chicken stew bowls',
-    category: 'Cooked meals',
-    quantity: 15,
-    unit: 'bowls',
-    freshness: 'Prepared today',
-    pickupWindow: '2:00 PM - 6:00 PM',
-    location: 'Ajah, Lagos',
-    postedAt: 'Today, 10:20 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=700&q=80'
-  },
-  {
-    id: 7,
-    title: 'Mixed salad trays',
-    category: 'Fresh produce',
-    quantity: 10,
-    unit: 'trays',
-    freshness: 'Prepared today',
-    pickupWindow: '11:00 AM - 2:00 PM',
-    location: 'Victoria Island, Lagos',
-    postedAt: 'Today, 9:45 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1543362906-acfc16c67564?w=700&q=80'
-  },
-  {
-    id: 8,
-    title: 'Pasta family packs',
-    category: 'Cooked meals',
-    quantity: 14,
-    unit: 'packs',
-    freshness: 'Prepared today',
-    pickupWindow: '1:00 PM - 4:00 PM',
-    location: 'Gbagada, Lagos',
-    postedAt: 'Today, 8:05 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1523986371872-9d3ba2e2f5cd?w=700&q=80'
-  },
-  {
-    id: 9,
-    title: 'Whole grain cereal',
-    category: 'Pantry',
-    quantity: 36,
-    unit: 'boxes',
-    freshness: 'Expires in 3 months',
-    pickupWindow: '9:00 AM - 5:00 PM',
-    location: 'Maryland, Lagos',
-    postedAt: 'Yesterday, 3:50 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=700&q=80'
-  },
-  {
-    id: 10,
-    title: 'Tomato crates',
-    category: 'Fresh produce',
-    quantity: 20,
-    unit: 'crates',
-    freshness: 'Picked today',
-    pickupWindow: '7:00 AM - 11:00 AM',
-    location: 'Oshodi, Lagos',
-    postedAt: 'Today, 6:00 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&q=80'
-  },
-  {
-    id: 11,
-    title: 'Fresh fish baskets',
-    category: 'Protein',
-    quantity: 8,
-    unit: 'baskets',
-    freshness: 'Caught today',
-    pickupWindow: '8:00 AM - 12:00 PM',
-    location: 'Badagry, Lagos',
-    postedAt: 'Today, 7:50 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1522184216316-2d2a3c5d52b4?w=700&q=80'
-  },
-  {
-    id: 12,
-    title: 'Beans and plantain',
-    category: 'Cooked meals',
-    quantity: 22,
-    unit: 'plates',
-    freshness: 'Prepared today',
-    pickupWindow: '3:00 PM - 6:00 PM',
-    location: 'Festac, Lagos',
-    postedAt: 'Today, 10:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1543353071-873f17a7a088?w=700&q=80'
-  },
-  {
-    id: 13,
-    title: 'Packaged water cartons',
-    category: 'Beverages',
-    quantity: 50,
-    unit: 'cartons',
-    freshness: 'Sealed',
-    pickupWindow: '9:00 AM - 6:00 PM',
-    location: 'Apapa, Lagos',
-    postedAt: 'Yesterday, 1:20 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1502741338009-cac2772e18bc?w=700&q=80'
-  },
-  {
-    id: 14,
-    title: 'Chicken shawarma wraps',
-    category: 'Cooked meals',
-    quantity: 18,
-    unit: 'wraps',
-    freshness: 'Prepared today',
-    pickupWindow: '12:00 PM - 3:00 PM',
-    location: 'Ikorodu, Lagos',
-    postedAt: 'Today, 9:30 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1529563021893-cc83c992d75d?w=700&q=80'
-  },
-  {
-    id: 15,
-    title: 'Baby cereal packs',
-    category: 'Pantry',
-    quantity: 28,
-    unit: 'packs',
-    freshness: 'Expires in 8 months',
-    pickupWindow: '10:00 AM - 4:00 PM',
-    location: 'Ojodu, Lagos',
-    postedAt: 'Yesterday, 4:30 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=700&q=80'
-  },
-  {
-    id: 16,
-    title: 'Vegetable sacks',
-    category: 'Fresh produce',
-    quantity: 12,
-    unit: 'sacks',
-    freshness: 'Picked today',
-    pickupWindow: '6:30 AM - 9:30 AM',
-    location: 'Agege, Lagos',
-    postedAt: 'Today, 6:10 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=700&q=80'
-  },
-  {
-    id: 17,
-    title: 'Beans sacks',
-    category: 'Pantry',
-    quantity: 10,
-    unit: 'sacks',
-    freshness: 'Sealed',
-    pickupWindow: '9:00 AM - 1:00 PM',
-    location: 'Mushin, Lagos',
-    postedAt: 'Yesterday, 2:15 PM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=700&q=80'
-  },
-  {
-    id: 18,
-    title: 'Fresh oranges',
-    category: 'Fresh produce',
-    quantity: 32,
-    unit: 'bags',
-    freshness: 'Picked today',
-    pickupWindow: '8:00 AM - 1:00 PM',
-    location: 'Epe, Lagos',
-    postedAt: 'Today, 7:35 AM',
-    status: 'Available',
-    image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=700&q=80'
-  }
-]
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { donationAPI, locationAPI, claimAPI } from '../api/api'
+import LoadingButton from '../components/LoadingButton'
 
 const Donation = () => {
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    navigate('/auth')
+  }
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingDonation, setEditingDonation] = useState(null)
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false)
+  const [deletingDonationId, setDeletingDonationId] = useState(null)
+  const [creating, setCreating] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const [page, setPage] = useState(1)
+  const [donations, setDonations] = useState([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [pickupLocations, setPickupLocations] = useState([])
+  const [claimsModalDonation, setClaimsModalDonation] = useState(null)
+  const [claimActionLoading, setClaimActionLoading] = useState(null)
+  const [formData, setFormData] = useState({
+    foodName: '',
+    foodType: 'VEG',
+    quantity: '',
+    description: '',
+    specialInstructions: '',
+    pickupDeadline: '',
+    pickupLocationId: '',
+    images: [],
+  })
+  const [editFormData, setEditFormData] = useState({
+    foodName: '',
+    foodType: 'VEG',
+    quantity: '',
+    description: '',
+    specialInstructions: '',
+    pickupDeadline: '',
+  })
+  const [newLocationData, setNewLocationData] = useState({
+    address: '',
+    city: '',
+    state: '',
+    pincode: '',
+  })
   const pageSize = 6
 
-  const totalPages = Math.ceil(donationsSeed.length / pageSize)
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * pageSize
-    return donationsSeed.slice(start, start + pageSize)
+  useEffect(() => {
+    document.title = 'My Donations — ReServe'
+  }, [])
+
+  useEffect(() => {
+    const fetchDonations = async () => {
+      try {
+        setLoading(true)
+        const response = await donationAPI.getMyDonations(page, pageSize)
+        setDonations(response.donations || [])
+        setTotalCount(response.totalCount || 0)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    const fetchLocations = async () => {
+      try {
+        const response = await locationAPI.getPickupLocations()
+        setPickupLocations(response.locations || [])
+      } catch (err) {
+        console.error('Error fetching locations:', err)
+      }
+    }
+
+    fetchDonations()
+    fetchLocations()
   }, [page])
+
+  const handleCreateDonation = async (e) => {
+    e.preventDefault()
+    try {
+      setCreating(true)
+      let finalLocationId = formData.pickupLocationId;
+
+      if (finalLocationId === 'NEW') {
+        const locationRes = await locationAPI.addPickup(newLocationData);
+        finalLocationId = locationRes.location.id;
+      }
+
+      const data = new FormData()
+      data.append('foodName', formData.foodName)
+      data.append('foodType', formData.foodType)
+      data.append('quantity', formData.quantity)
+      data.append('description', formData.description)
+      data.append('specialInstructions', formData.specialInstructions)
+      data.append('pickupDeadline', formData.pickupDeadline)
+      data.append('pickupLocationId', finalLocationId)
+      
+      if (formData.images && formData.images.length > 0) {
+        formData.images.forEach((file) => {
+          data.append('images', file)
+        })
+      }
+
+      await donationAPI.create(data)
+      setFormData({
+        foodName: '',
+        foodType: 'VEG',
+        quantity: '',
+        description: '',
+        specialInstructions: '',
+        pickupDeadline: '',
+        pickupLocationId: '',
+        images: [],
+      })
+      setNewLocationData({
+        address: '',
+        city: '',
+        state: '',
+        pincode: '',
+      })
+      setIsModalOpen(false)
+      const response = await donationAPI.getMyDonations(1, pageSize)
+      setDonations(response.donations || [])
+      setTotalCount(response.totalCount || 0)
+      setPage(1)
+      
+      const locResponse = await locationAPI.getPickupLocations()
+      setPickupLocations(locResponse.locations || [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleClaimAction = async (claimId, status) => {
+    try {
+      setClaimActionLoading(claimId)
+      await claimAPI.updateStatus(claimId, status)
+      const response = await donationAPI.getMyDonations(page, pageSize)
+      setDonations(response.donations || [])
+      setTotalCount(response.totalCount || 0)
+      if (claimsModalDonation) {
+        const updated = response.donations.find(d => d.id === claimsModalDonation.id)
+        if (updated) setClaimsModalDonation(updated)
+      }
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setClaimActionLoading(null)
+    }
+  }
+
+  const handleOpenEdit = (donation) => {
+    setEditingDonation(donation)
+    setEditFormData({
+      foodName: donation.foodName,
+      foodType: donation.foodType,
+      quantity: String(donation.quantity),
+      description: donation.description || '',
+      specialInstructions: donation.specialInstructions || '',
+      pickupDeadline: donation.pickupDeadline ? new Date(donation.pickupDeadline).toISOString().slice(0, 16) : '',
+    })
+    setIsEditModalOpen(true)
+  }
+
+  const handleUpdateDonation = async (e) => {
+    e.preventDefault()
+    if (!editingDonation) return
+    try {
+      setSaving(true)
+      setError('')
+      await donationAPI.update(editingDonation.id, editFormData)
+      setIsEditModalOpen(false)
+      setEditingDonation(null)
+      const response = await donationAPI.getMyDonations(page, pageSize)
+      setDonations(response.donations || [])
+      setTotalCount(response.totalCount || 0)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleOpenDelete = (donationId) => {
+    setDeletingDonationId(donationId)
+    setIsDeleteConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingDonationId) return
+    try {
+      setDeleting(true)
+      setError('')
+      await donationAPI.delete(deletingDonationId)
+      setIsDeleteConfirmOpen(false)
+      setDeletingDonationId(null)
+      const response = await donationAPI.getMyDonations(page, pageSize)
+      setDonations(response.donations || [])
+      setTotalCount(response.totalCount || 0)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize))
+
+  const pendingClaimsCount = (donation) => {
+    return donation.claims?.filter(c => c.status === 'PENDING').length || 0
+  }
 
   return (
     <div className="bg-white text-[#1A1A1A]">
@@ -274,12 +245,34 @@ const Donation = () => {
             </svg>
             <span className="text-lg font-semibold tracking-tight text-gray-900">ReServe</span>
           </Link>
-          <Link
-            className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
-            to="/onboarding"
-          >
-            User Name
-          </Link>
+          <div className="hidden items-center gap-8 text-sm text-gray-600 md:flex">
+            <Link className="hover:opacity-70" to="/">
+              Home
+            </Link>
+            <Link className="hover:opacity-70 font-semibold text-gray-900" to="/donations">
+              Donations
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="group relative">
+              <button
+                className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white"
+                type="button"
+              >
+                <span className="text-xs font-semibold text-gray-600">RS</span>
+              </button>
+              <div className="invisible absolute z-50 right-0 top-full w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
+                <div className="rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg">
+                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to={localStorage.getItem('isOnboarded') === 'true' ? '/profile' : '/onboarding'}>
+                    Profile
+                  </Link>
+                  <button onClick={handleLogout} className="block w-full text-left rounded-lg px-3 py-2 hover:bg-gray-50">
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </nav>
       </section>
 
@@ -293,8 +286,7 @@ const Donation = () => {
               Your surplus listings
             </h1>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-gray-500">
-              Track surplus from restaurants, weddings, and events. Update pickup windows so NGO partners can claim
-              quickly.
+              Track surplus from restaurants, weddings, and events. Review and manage claims from NGO partners.
             </p>
           </div>
           <button
@@ -309,99 +301,342 @@ const Donation = () => {
 
       <section className="bg-[#F5F0E8]/40 py-10">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {pageItems.map((item) => (
-              <article key={item.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                <div className="relative h-[180px]">
-                  <img alt={item.title} className="h-full w-full object-cover" src={item.image} />
-                  <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700">
-                    {item.status}
-                  </span>
-                </div>
-                <div className="space-y-3 px-5 py-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
-                      <p className="text-xs text-gray-400">{item.category}</p>
+          {loading ? (
+            <div className="text-center text-gray-500">Loading donations...</div>
+          ) : error ? (
+            <div className="text-center text-red-500">{error}</div>
+          ) : donations.length === 0 ? (
+            <div className="text-center py-16">
+              <p className="text-lg font-semibold text-gray-700">No donations yet</p>
+              <p className="mt-2 text-sm text-gray-400">Click "Add new" to create your first surplus listing.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                {donations.map((item) => (
+                  <article key={item.id} className="overflow-hidden rounded-2xl bg-white shadow-sm">
+                    <div className="relative h-[180px] bg-gray-200">
+                      {item.images?.[0]?.imageUrl ? (
+                        <img alt={item.foodName} className="h-full w-full object-cover" src={item.images[0].imageUrl} />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-gray-400">No image</div>
+                      )}
+                      <span className="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-gray-700">
+                        {item.status || 'AVAILABLE'}
+                      </span>
+                      <div className="absolute right-4 top-4 flex gap-2">
+                        <button
+                          className="rounded-full bg-white/90 p-1.5 text-gray-700 shadow-sm hover:bg-white"
+                          onClick={() => handleOpenEdit(item)}
+                          title="Edit listing"
+                          type="button"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </button>
+                        <button
+                          className="rounded-full bg-white/90 p-1.5 text-red-600 shadow-sm hover:bg-white"
+                          onClick={() => handleOpenDelete(item.id)}
+                          title="Delete listing"
+                          type="button"
+                        >
+                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-lg font-black text-[#1A1A1A]" style={{ fontFamily: "'Playfair Display', serif" }}>
-                        {item.quantity}
-                      </p>
-                      <p className="text-xs text-gray-400">{item.unit}</p>
+                    <div className="space-y-3 px-5 py-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900">{item.foodName}</h3>
+                          <p className="text-xs text-gray-400">{item.foodType}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-black text-[#1A1A1A]" style={{ fontFamily: "'Playfair Display', serif" }}>
+                            {item.quantity}
+                          </p>
+                          <p className="text-xs text-gray-400">Items</p>
+                        </div>
+                      </div>
+                      <div className="grid gap-2 text-xs text-gray-500">
+                        <div className="flex items-center justify-between">
+                          <span>Location</span>
+                          <span className="font-medium text-gray-700">{item.pickupLocation?.city || 'N/A'}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Deadline</span>
+                          <span className="font-medium text-gray-700">{new Date(item.pickupDeadline).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-400">
+                        <span>Posted</span>
+                        <span>{new Date(item.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-gray-500">Claims:</span>
+                          <span className={`font-semibold ${pendingClaimsCount(item) > 0 ? 'text-[#F4A01C]' : 'text-gray-700'}`}>
+                            {item.claims?.length || 0} total
+                            {pendingClaimsCount(item) > 0 ? ` (${pendingClaimsCount(item)} pending)` : ''}
+                          </span>
+                        </div>
+                        {(item.claims?.length || 0) > 0 && (
+                          <button
+                            className="text-xs font-semibold text-[#F4A01C] hover:text-[#d4880f]"
+                            onClick={() => setClaimsModalDonation(item)}
+                            type="button"
+                          >
+                            View claims
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid gap-2 text-xs text-gray-500">
-                    <div className="flex items-center justify-between">
-                      <span>Freshness</span>
-                      <span className="font-medium text-gray-700">{item.freshness}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Pickup window</span>
-                      <span className="font-medium text-gray-700">{item.pickupWindow}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Location</span>
-                      <span className="font-medium text-gray-700">{item.location}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-400">
-                    <span>Posted</span>
-                    <span>{item.postedAt}</span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+                  </article>
+                ))}
+              </div>
 
-          <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-gray-500">
-              Showing {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, donationsSeed.length)} of{' '}
-              {donationsSeed.length} donations
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={page === 1}
-                onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-                type="button"
-              >
-                Prev
-              </button>
-              {Array.from({ length: totalPages }).map((_, index) => {
-                const value = index + 1
-                const isActive = value === page
-                return (
+              <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+                <p className="text-xs text-gray-500">
+                  {totalCount > 0
+                    ? `Showing ${(page - 1) * pageSize + 1} - ${Math.min(page * pageSize, totalCount)} of ${totalCount} donations`
+                    : 'No donations found'}
+                </p>
+                <div className="flex items-center gap-2">
                   <button
-                    key={value}
-                    className={`rounded px-3 py-2 text-xs transition ${
-                      isActive
-                        ? 'bg-[#1A1A1A] text-white'
-                        : 'border border-gray-300 text-gray-600 hover:bg-white'
-                    }`}
-                    onClick={() => setPage(value)}
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={page === 1}
+                    onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                     type="button"
                   >
-                    {value}
+                    Prev
                   </button>
-                )
-              })}
-              <button
-                className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-                disabled={page === totalPages}
-                onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
-                type="button"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+                  <button
+                    className="rounded border border-gray-300 px-3 py-2 text-xs text-gray-600 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                    disabled={page === totalPages}
+                    onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                    type="button"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
+      {claimsModalDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2
+                  className="text-2xl font-black text-gray-900"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Claims for {claimsModalDonation.foodName}
+                </h2>
+                <p className="mt-1 text-xs text-gray-500">
+                  Review and manage pickup requests from NGO partners.
+                </p>
+              </div>
+              <button className="text-sm text-gray-400 hover:text-gray-700" onClick={() => setClaimsModalDonation(null)}>
+                Close
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {claimsModalDonation.claims?.length === 0 ? (
+                <p className="text-center py-8 text-sm text-gray-400">No claims for this donation yet.</p>
+              ) : claimsModalDonation.claims.map((claim) => (
+                <div key={claim.id} className="rounded-xl border border-gray-100 px-4 py-4">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-semibold text-gray-400">Claim #{claim.id}</p>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            claim.status === 'PENDING'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : claim.status === 'ACCEPTED'
+                              ? 'bg-green-100 text-green-800'
+                              : claim.status === 'REJECTED'
+                              ? 'bg-red-100 text-red-800'
+                              : claim.status === 'PICKED_UP'
+                              ? 'bg-blue-100 text-blue-800'
+                              : claim.status === 'COMPLETED'
+                              ? 'bg-[#4CAF50]/15 text-[#2f7a33]'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          {claim.status}
+                        </span>
+                      </div>
+                      <h3 className="text-base font-semibold text-gray-900 mt-1">{claim.claimer?.name || 'Anonymous NGO'}</h3>
+                      <p className="text-xs text-gray-500">{claim.claimer?.phone || claim.claimer?.email || ''}</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Qty: <span className="font-medium text-gray-700">{claim.quantity || 0}</span> &middot; Pickup: {claim.scheduledPickup ? new Date(claim.scheduledPickup).toLocaleDateString() : 'TBD'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {claim.status === 'PENDING' && (
+                        <>
+                          <LoadingButton
+                            className="rounded bg-[#4CAF50] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#3d9140] disabled:opacity-50"
+                            loading={claimActionLoading === claim.id}
+                            onClick={() => handleClaimAction(claim.id, 'ACCEPTED')}
+                            type="button"
+                          >
+                            Accept
+                          </LoadingButton>
+                          <LoadingButton
+                            className="rounded border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-50"
+                            loading={claimActionLoading === claim.id}
+                            onClick={() => handleClaimAction(claim.id, 'REJECTED')}
+                            type="button"
+                          >
+                            Reject
+                          </LoadingButton>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isEditModalOpen && editingDonation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  Edit listing
+                </h2>
+                <p className="mt-1 text-xs text-gray-500">Update your surplus listing details.</p>
+              </div>
+              <button className="text-sm text-gray-400 hover:text-gray-700" onClick={() => { setIsEditModalOpen(false); setEditingDonation(null); }}>
+                Close
+              </button>
+            </div>
+
+            <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={handleUpdateDonation}>
+              <div className="md:col-span-2">
+                <label className="text-xs font-semibold text-gray-600">Food name</label>
+                <input
+                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  placeholder="Eg. Rice and beans"
+                  type="text"
+                  value={editFormData.foodName}
+                  onChange={(e) => setEditFormData({ ...editFormData, foodName: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600">Food type</label>
+                <select
+                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  value={editFormData.foodType}
+                  onChange={(e) => setEditFormData({ ...editFormData, foodType: e.target.value })}
+                >
+                  <option value="VEG">Vegetarian</option>
+                  <option value="NON_VEG">Non-vegetarian</option>
+                </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600">Quantity</label>
+                <input
+                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  placeholder="25"
+                  type="number"
+                  value={editFormData.quantity}
+                  onChange={(e) => setEditFormData({ ...editFormData, quantity: e.target.value })}
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600">Pickup deadline</label>
+                <input
+                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  type="datetime-local"
+                  value={editFormData.pickupDeadline}
+                  onChange={(e) => setEditFormData({ ...editFormData, pickupDeadline: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs font-semibold text-gray-600">Description</label>
+                <textarea
+                  className="mt-2 h-20 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  placeholder="Food details"
+                  value={editFormData.description}
+                  onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs font-semibold text-gray-600">Special instructions</label>
+                <textarea
+                  className="mt-2 h-20 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  placeholder="Allergy notes, storage instructions, or pickup details"
+                  value={editFormData.specialInstructions}
+                  onChange={(e) => setEditFormData({ ...editFormData, specialInstructions: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2 flex flex-wrap justify-end gap-3">
+                <button
+                  className="rounded border border-gray-200 px-4 py-2 text-xs uppercase tracking-[0.12em] text-gray-600"
+                  onClick={() => { setIsEditModalOpen(false); setEditingDonation(null); }}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <LoadingButton className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.12em] text-white" type="submit" loading={saving}>
+                  Save changes
+                </LoadingButton>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {isDeleteConfirmOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+              Delete listing?
+            </h2>
+            <p className="mt-2 text-sm text-gray-500">
+              This will permanently remove this donation and all associated claims. This action cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                className="rounded border border-gray-200 px-4 py-2 text-xs uppercase tracking-[0.12em] text-gray-600"
+                onClick={() => { setIsDeleteConfirmOpen(false); setDeletingDonationId(null); }}
+                type="button"
+              >
+                Cancel
+              </button>
+              <LoadingButton
+                className="rounded bg-red-600 px-4 py-2 text-xs uppercase tracking-[0.12em] text-white hover:bg-red-700"
+                onClick={handleConfirmDelete}
+                type="button"
+                loading={deleting}
+              >
+                Delete
+              </LoadingButton>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isModalOpen ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-10">
-          <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-xl">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
                 <h2
@@ -417,52 +652,139 @@ const Donation = () => {
               </button>
             </div>
 
-            <form className="mt-6 grid gap-4 md:grid-cols-2">
+            <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={handleCreateDonation}>
               <div className="md:col-span-2">
                 <label className="text-xs font-semibold text-gray-600">Food name</label>
                 <input
                   className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                   placeholder="Eg. Rice and beans"
                   type="text"
+                  value={formData.foodName}
+                  onChange={(e) => setFormData({ ...formData, foodName: e.target.value })}
+                  required
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600">Category</label>
-                <input
+                <label className="text-xs font-semibold text-gray-600">Food type</label>
+                <select
                   className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="Cooked meals, Pantry, Dairy"
-                  type="text"
-                />
+                  value={formData.foodType}
+                  onChange={(e) => setFormData({ ...formData, foodType: e.target.value })}
+                >
+                  <option value="VEG">Vegetarian</option>
+                  <option value="NON_VEG">Non-vegetarian</option>
+                </select>
               </div>
               <div>
                 <label className="text-xs font-semibold text-gray-600">Quantity</label>
                 <input
                   className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="25 packs"
-                  type="text"
+                  placeholder="25"
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                  required
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600">Pickup window</label>
-                <input
+                <label className="text-xs font-semibold text-gray-600">Pickup location</label>
+                <select
                   className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="10:00 AM - 1:00 PM"
-                  type="text"
-                />
+                  value={formData.pickupLocationId}
+                  onChange={(e) => setFormData({ ...formData, pickupLocationId: e.target.value })}
+                  required
+                >
+                  <option value="">Select a location</option>
+                  {pickupLocations.map((loc) => (
+                    <option key={loc.id} value={loc.id}>{loc.address}</option>
+                  ))}
+                  <option value="NEW">+ Add new location</option>
+                </select>
               </div>
+              {formData.pickupLocationId === 'NEW' && (
+                <div className="md:col-span-2 grid gap-4 md:grid-cols-2 rounded-xl bg-gray-50 p-4 border border-gray-100">
+                  <div className="md:col-span-2">
+                    <label className="text-xs font-semibold text-gray-600">Address</label>
+                    <input
+                      className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                      placeholder="123 Street Name"
+                      type="text"
+                      value={newLocationData.address}
+                      onChange={(e) => setNewLocationData({ ...newLocationData, address: e.target.value })}
+                      required={formData.pickupLocationId === 'NEW'}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">City</label>
+                    <input
+                      className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                      placeholder="City"
+                      type="text"
+                      value={newLocationData.city}
+                      onChange={(e) => setNewLocationData({ ...newLocationData, city: e.target.value })}
+                      required={formData.pickupLocationId === 'NEW'}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">State</label>
+                    <input
+                      className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                      placeholder="State"
+                      type="text"
+                      value={newLocationData.state}
+                      onChange={(e) => setNewLocationData({ ...newLocationData, state: e.target.value })}
+                      required={formData.pickupLocationId === 'NEW'}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600">Pincode</label>
+                    <input
+                      className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                      placeholder="Pincode"
+                      type="text"
+                      value={newLocationData.pincode}
+                      onChange={(e) => setNewLocationData({ ...newLocationData, pincode: e.target.value })}
+                      required={formData.pickupLocationId === 'NEW'}
+                    />
+                  </div>
+                </div>
+              )}
               <div>
-                <label className="text-xs font-semibold text-gray-600">Location</label>
+                <label className="text-xs font-semibold text-gray-600">Pickup deadline</label>
                 <input
                   className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
-                  placeholder="Ikoyi, Lagos"
-                  type="text"
+                  type="datetime-local"
+                  value={formData.pickupDeadline}
+                  onChange={(e) => setFormData({ ...formData, pickupDeadline: e.target.value })}
+                  required
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="text-xs font-semibold text-gray-600">Notes</label>
+                <label className="text-xs font-semibold text-gray-600">Description</label>
                 <textarea
-                  className="mt-2 h-24 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  className="mt-2 h-20 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  placeholder="Food details"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs font-semibold text-gray-600">Special instructions</label>
+                <textarea
+                  className="mt-2 h-20 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
                   placeholder="Allergy notes, storage instructions, or pickup details"
+                  value={formData.specialInstructions}
+                  onChange={(e) => setFormData({ ...formData, specialInstructions: e.target.value })}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-xs font-semibold text-gray-600">Images (optional)</label>
+                <input
+                  className="mt-2 w-full rounded border border-gray-200 px-4 py-3 text-sm focus:border-[#F4A01C] focus:outline-none"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => setFormData({ ...formData, images: Array.from(e.target.files) })}
                 />
               </div>
               <div className="md:col-span-2 flex flex-wrap justify-end gap-3">
@@ -473,12 +795,13 @@ const Donation = () => {
                 >
                   Cancel
                 </button>
-                <button
+                <LoadingButton
                   className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.12em] text-white"
-                  type="button"
+                  type="submit"
+                  loading={creating}
                 >
                   Create listing
-                </button>
+                </LoadingButton>
               </div>
             </form>
           </div>

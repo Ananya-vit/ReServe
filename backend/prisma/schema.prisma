@@ -195,6 +195,8 @@ model Claim {
 
   status ClaimStatusEnum @default(PENDING)
 
+  quantity Int @default(0)
+
   scheduledPickup DateTime?
 
   actualPickup DateTime?

@@ -1,20 +1,99 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { authAPI } from '../api/api'
+import LoadingButton from '../components/LoadingButton'
 
 const OtpVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
+  const inputRefs = useRef([])
   const navigate = useNavigate()
+  const location = useLocation()
+  const email = location.state?.email
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [resendMessage, setResendMessage] = useState('')
+  const [resending, setResending] = useState(false)
+
+  useEffect(() => {
+    document.title = 'Verify Email — ReServe'
+    if (!email) {
+      navigate('/auth')
+      return
+    }
+    // Auto-focus first input on mount
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus()
+    }
+  }, [email, navigate])
 
   const handleOtpChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return
     const next = [...otp]
     next[index] = value
     setOtp(next)
+
+    // Auto-advance to next input when a digit is entered
+    if (value && index < 5 && inputRefs.current[index + 1]) {
+      inputRefs.current[index + 1].focus()
+    }
   }
 
-  const handleSubmit = (event) => {
+  const handleKeyDown = (index, event) => {
+    // On backspace with empty input, focus previous input
+    if (event.key === 'Backspace' && !otp[index] && index > 0 && inputRefs.current[index - 1]) {
+      inputRefs.current[index - 1].focus()
+    }
+  }
+
+  const handlePaste = (event) => {
     event.preventDefault()
-    navigate('/onboarding')
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+    if (pasted.length > 0) {
+      const next = [...otp]
+      for (let i = 0; i < 6; i++) {
+        next[i] = pasted[i] || ''
+      }
+      setOtp(next)
+      // Focus the input after the last pasted digit
+      const focusIndex = Math.min(pasted.length, 5)
+      if (inputRefs.current[focusIndex]) {
+        inputRefs.current[focusIndex].focus()
+      }
+    }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const code = otp.join('')
+    if (code.length < 6) {
+      setError('Please enter all 6 digits')
+      return
+    }
+    try {
+      setLoading(true)
+      setError('')
+      await authAPI.verifyOtp(email, code)
+      const isOnboarded = localStorage.getItem('isOnboarded') === 'true'
+      navigate(isOnboarded ? '/profile' : '/onboarding')
+    } catch (err) {
+      setError(err.message || 'Invalid or expired OTP')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    try {
+      setResending(true)
+      setError('')
+      setResendMessage('')
+      await authAPI.resendOtp(email)
+      setResendMessage('New code sent to your email.')
+    } catch (err) {
+      setError(err.message || 'Failed to resend code')
+    } finally {
+      setResending(false)
+    }
   }
 
   return (
@@ -92,24 +171,36 @@ const OtpVerification = () => {
                 {otp.map((value, index) => (
                   <input
                     key={`otp-${index}`}
+                    ref={(el) => (inputRefs.current[index] = el)}
                     className="h-12 w-12 rounded border border-gray-200 text-center text-lg focus:border-[#F4A01C] focus:outline-none"
                     maxLength={1}
                     onChange={(event) => handleOtpChange(index, event.target.value)}
+                    onKeyDown={(event) => handleKeyDown(index, event)}
+                    onPaste={index === 0 ? handlePaste : undefined}
                     type="text"
+                    inputMode="numeric"
                     value={value}
                   />
                 ))}
               </div>
-              <button
-                className="w-full rounded bg-[#F4A01C] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white"
+              <LoadingButton
+                className="w-full rounded bg-[#F4A01C] px-4 py-3 text-xs uppercase tracking-[0.2em] text-white disabled:opacity-50"
                 type="submit"
+                loading={loading}
               >
                 Verify and continue
-              </button>
+              </LoadingButton>
+              {error && <div className="rounded bg-red-100 p-2 text-xs text-red-700">{error}</div>}
+              {resendMessage && <div className="rounded bg-green-100 p-2 text-xs text-green-700">{resendMessage}</div>}
               <div className="flex flex-col gap-2 text-xs text-gray-500 sm:flex-row sm:items-center sm:justify-between">
-                <button className="font-semibold text-[#F4A01C]" type="button">
+                <LoadingButton 
+                  className="font-semibold text-[#F4A01C]" 
+                  onClick={handleResend}
+                  type="button"
+                  loading={resending}
+                >
                   Resend code
-                </button>
+                </LoadingButton>
                 <Link className="font-semibold text-gray-600 hover:text-[#1A1A1A]" to="/auth">
                   Change email address
                 </Link>

@@ -1,8 +1,19 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 
 const HomePage = () => {
-  const isLoggedIn = false
+  const navigate = useNavigate()
+  const isLoggedIn = !!localStorage.getItem('accessToken')
+
+  useEffect(() => {
+    document.title = 'ReServe — Surplus Food Exchange'
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    navigate('/auth')
+  }
   return (
     <div className="bg-white text-[#1A1A1A]">
       {/* HERO */}
@@ -24,7 +35,7 @@ const HomePage = () => {
           style={{ borderRadius: '40% 60% 30% 70% / 60% 40% 60% 40%' }}
         />
 
-        <nav className="relative z-50 flex items-center justify-between px-6 py-6 md:px-10">
+        <nav className="relative z-[50] flex items-center justify-between px-6 py-6 md:px-10">
           <Link className="flex items-center gap-2" to="/">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -63,13 +74,15 @@ const HomePage = () => {
                 >
                   <span className="text-xs font-semibold text-gray-600">RS</span>
                 </button>
-                <div className="invisible absolute right-0 mt-2 w-36 rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg opacity-0 transition group-hover:visible group-hover:opacity-100">
-                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to="/onboarding">
-                    Profile
-                  </Link>
-                  <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to="/auth">
-                    Logout
-                  </Link>
+                <div className="invisible absolute z-50 right-0 top-full w-36 pt-2 opacity-0 transition group-hover:visible group-hover:opacity-100">
+                  <div className="rounded-xl border border-gray-100 bg-white p-2 text-xs text-gray-600 shadow-lg">
+                    <Link className="block rounded-lg px-3 py-2 hover:bg-gray-50" to={localStorage.getItem('isOnboarded') === 'true' ? '/profile' : '/onboarding'}>
+                      Profile
+                    </Link>
+                    <button onClick={handleLogout} className="block w-full text-left rounded-lg px-3 py-2 hover:bg-gray-50">
+                      Logout
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -118,7 +131,7 @@ const HomePage = () => {
                 className="rounded bg-[#1A1A1A] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#333]"
                 to="/donations"
               >
-                List surplus
+                {isLoggedIn ? "Go to Dashboard" : "List surplus"}
               </Link>
               <Link className="flex items-center gap-1 text-sm text-gray-600 hover:opacity-70" to="/donations">
                 Browse donations
@@ -541,18 +554,29 @@ const HomePage = () => {
               </h2>
               <p className="mb-8 text-xl font-light">Restaurants, caterers, and NGOs are welcome.</p>
               <div className="flex gap-4">
-                <Link
-                  className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#d4880f]"
-                  to="/donations"
-                >
-                  Create listing
-                </Link>
-                <Link
-                  className="rounded border-2 border-white px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-white hover:text-[#1A1A1A]"
-                  to="/claims"
-                >
-                  Partner as NGO
-                </Link>
+                {isLoggedIn ? (
+                  <Link
+                    className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#d4880f]"
+                    to="/donations"
+                  >
+                    Go to Dashboard
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      className="rounded bg-[#F4A01C] px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-[#d4880f]"
+                      to="/donations"
+                    >
+                      Create listing
+                    </Link>
+                    <Link
+                      className="rounded border-2 border-white px-5 py-2 text-xs uppercase tracking-[0.06em] text-white transition hover:bg-white hover:text-[#1A1A1A]"
+                      to="/claims"
+                    >
+                      Partner as NGO
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -652,7 +676,7 @@ const HomePage = () => {
                 Discover
               </Link>
             </div>
-            <p>© 2024 ReServe. All Rights Reserved.</p>
+            <p>© {new Date().getFullYear()} ReServe. All Rights Reserved.</p>
           </div>
         </div>
       </footer>

@@ -8,11 +8,7 @@ const generateRefreshToken = (payload: object) => {
   return jwt.sign(payload, myEnv.JWT_SECRET_KEY, { algorithm: "HS512", expiresIn: "7d" });
 }
 const verifyToken = (token: string) => {
-  try {
-    return jwt.verify(token, myEnv.JWT_SECRET_KEY, { algorithms: ["HS512"] });
-  } catch (error) {
-    throw new Error("Invalid token");
-  }
+  return jwt.verify(token, myEnv.JWT_SECRET_KEY, { algorithms: ["HS512"] });
 };
 
 export { generateAccessToken, generateRefreshToken, verifyToken };

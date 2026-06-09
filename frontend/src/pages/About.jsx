@@ -1,7 +1,11 @@
-import React from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 
 const About = () => {
+  useEffect(() => {
+    document.title = 'About — ReServe'
+  }, [])
+
   return (
     <div className="bg-white text-[#1A1A1A]">
       <section className="relative overflow-hidden bg-white">
